@@ -361,6 +361,21 @@ export const TEMPLATES: Record<string, Template> = {
         ],
       },
       {
+        title: 'Staff records and clock-in compliance',
+        fields: [
+          yn('clock_in', 'Full clock-in and clock-out compliance this week', 'no', 'Staff member(s) not compliant'),
+          yn('leave_email', 'All permission and leave requests received by email', 'no', 'Received verbally / WhatsApp from'),
+          yn('records_change', 'Any change in staff records (new joining, departure, change in status)', 'yes', 'Details'),
+        ],
+      },
+      {
+        title: 'Communications compliance',
+        fields: [
+          LS('comms_sent', 'Official school communications sent this week (letters, notices, parent letters)'),
+          yn('comms_unapproved', 'Any communication sent without Director approval that should have been approved', 'yes', 'Details'),
+        ],
+      },
+      {
         title: 'Part G: Look ahead',
         fields: [
           L('fees_drive', 'Planned fees drive next week'),
@@ -519,6 +534,54 @@ export const TEMPLATES: Record<string, Template> = {
         ],
       },
       {
+        title: 'Scheme of work compliance (Mondays)',
+        days: [1],
+        fields: [
+          list('plans_checked', 'Teachers whose lesson plans were cross-checked against the scheme today'),
+          L('discrepancies', 'Discrepancies found (teacher, subject, what was planned vs what the scheme requires)'),
+          yn('project_work', 'Project work appeared in lesson plans where the scheme requires it', 'no', 'Missing in these subjects'),
+        ],
+      },
+      {
+        title: 'Classroom visit',
+        fields: [
+          text('visited', 'Teacher / class visited'),
+          text('subject', 'Subject being taught'),
+          checks('quality', 'Teaching quality observed (tick what applied)', [
+            'Prepared and on-scheme',
+            'Students actively engaged',
+            'Board well-organised',
+            'Lesson plan visible',
+            'Teacher unprepared',
+            'Dictating from textbook',
+            'Students passive',
+            'Phone in use',
+          ]),
+          L('visit_notes', 'Notes from visit'),
+        ],
+      },
+      {
+        title: 'Class captain check-in (Mondays)',
+        days: [1],
+        fields: [
+          list('captains', 'Captains spoken to today (class and captain name)'),
+          L('captain_reports', 'Notable reports from class captains (lessons disrupted, materials issues, attendance gaps)'),
+        ],
+      },
+      {
+        title: 'Diary check (Fridays)',
+        days: [5],
+        fields: [
+          list('diary_submitted', 'Part-time teachers who submitted diary entries for the week'),
+          LS('diary_missing', 'Part-time teachers with missing or incomplete diary entries'),
+          choice('diary_gaps', 'Diary result', [
+            'All submitted, no gaps',
+            'Gaps found: Director informed before 5 PM',
+            'Gaps found: Director not yet informed',
+          ]),
+        ],
+      },
+      {
         title: 'Part E: Parents',
         fields: [L('complaints', 'Complaints / enquiries from parents'), L('handled', 'How did you handle it?')],
       },
@@ -643,7 +706,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           L('withdrawn', 'Learner(s) withdrawn / transferring (name, class, reason)'),
           YO('exit_updated', 'Exit records updated on all platforms'),
-          YO('fee_referred', 'Fee-related enquiries referred to Bursar / OPM'),
+          { id: 'fee_referred', type: 'yesno', label: 'Fee-related enquiries referred to Bursar / OPM', detail: { on: 'yes', label: 'How many?' }, optional: true },
         ],
       },
       {
