@@ -284,10 +284,8 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'Part B: Debtors',
         fields: [
           N('debtors_n', 'Number of debtors'),
-          L('top_debtors', 'Top debtors (learner, class, amount owed ₦, last contact)'),
           L('promises_due', 'Payment promises due next week (parent, amount ₦, date)'),
-          L('broken', 'Broken promises this week (parent, amount ₦)'),
-          L('approved_plans', 'Approved payment plans (parent, learner, terms)'),
+          L('approved_plans', 'Approved payment plans on email (parent, learner, terms)'),
         ],
       },
       {
@@ -304,8 +302,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           N('expenses_total', 'Total expenses this week (₦)'),
           L('major', 'Major expenses (item, amount ₦)'),
-          N('petty_end', 'Petty cash balance at week end (₦)'),
-          yn('unapproved', 'Items purchased without prior approval', 'yes', 'Details'),
+          L('unapproved', 'Items purchased without prior plan / approval (Yes/No, details)'),
         ],
       },
       {
