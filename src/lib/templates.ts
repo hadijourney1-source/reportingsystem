@@ -328,7 +328,6 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           yn('clock_in', 'Full clock-in and clock-out compliance this week', 'no', 'Staff member(s) not compliant'),
           yn('leave_email', 'All permission and requests received by email', 'no', 'Received verbally / WhatsApp from'),
-          yn('records_change', 'Any change in staff records (new joining, departure, change in status)', 'yes', 'Details'),
         ],
       },
       {
@@ -336,14 +335,6 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           LS('comms_sent', 'Official school communications sent this week (letters, notices, parent letters)'),
           yn('comms_unapproved', 'Any communication sent without Director approval that should have been approved', 'yes', 'Details'),
-        ],
-      },
-      {
-        title: 'Part G: Look ahead',
-        fields: [
-          L('fees_drive', 'Planned fees drive next week'),
-          NO('expected_expenses', 'Expected expenses next week (₦)'),
-          L('resources', 'Resources needed'),
         ],
       },
       closing,
