@@ -130,21 +130,20 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           long('intervention', 'Critical and High Intervention students: update on each today'),
           long('new_concerns', 'New students showing academic concern, not previously flagged', true),
-          long('cbt', 'CBT or assessment results received today: any class or student of concern', true),
         ],
       },
       {
         title: 'D. Student conduct',
         fields: [
-          long('discipline', 'Discipline incidents today (summary, not individual slips)'),
+          long('discipline', 'Discipline incidents today'),
           long('patterns', 'Patterns observed in student behaviour, positive or negative', true),
         ],
       },
       {
         title: 'E. Teacher conduct and welfare',
         fields: [
-          yn('teacher_concern', 'Any teacher conduct concern today (lateness, phone use, language, preparation)', 'yes'),
-          long('welfare', 'Staff welfare or wellbeing matters to flag', true),
+          yn('teacher_concern', 'Any teacher conduct concern today (lateness, phone use, language, preparation)'),
+          long('welfare', 'Details of the concern (teacher name and class)', true),
         ],
       },
       {
