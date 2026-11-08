@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { NO_PIN_ROLES } from './templates';
 
 export type Me = { id: string; name: string; role: string; pin?: string };
 
@@ -19,7 +20,7 @@ export function useMe(): Me | null {
       const raw = localStorage.getItem(KEY);
       if (raw) {
         const saved = JSON.parse(raw) as Me;
-        if (saved.pin) return setMe(saved);
+        if (saved.pin || NO_PIN_ROLES.includes(saved.role)) return setMe(saved);
         clearMe();
       }
     } catch {}

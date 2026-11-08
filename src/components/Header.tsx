@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { clearMe, type Me } from '@/lib/useMe';
+import { NO_PIN_ROLES } from '@/lib/templates';
 
 const READERS = ['director', 'head_of_school', 'vice_principal', 'operations_manager'];
 
@@ -29,7 +30,9 @@ export function Header({ me }: { me: Me }) {
         </nav>
         <div className="flex items-center gap-3 text-sm text-white/80">
           <span className="hidden sm:inline">{me.name}</span>
-          <Link href="/pin" className="py-2 underline-offset-2 hover:underline">PIN</Link>
+          {!NO_PIN_ROLES.includes(me.role) && (
+            <Link href="/pin" className="py-2 underline-offset-2 hover:underline">PIN</Link>
+          )}
           <button onClick={switchPerson} className="min-h-11 rounded border border-white/40 px-3 text-white">
             Not you?
           </button>

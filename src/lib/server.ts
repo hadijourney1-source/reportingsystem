@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { NO_PIN_ROLES } from './templates';
 
 // Server-only. The service key never reaches the browser.
 export const db = () =>
@@ -21,6 +22,7 @@ export async function findStaff(id: unknown): Promise<StaffRow | null> {
 
 // Everyone has their own PIN. A person with no PIN set cannot sign in.
 export function pinOk(staff: StaffRow, pin: unknown): boolean {
+  if (NO_PIN_ROLES.includes(staff.role)) return true;
   return !!staff.pin && typeof pin === 'string' && pin === staff.pin;
 }
 

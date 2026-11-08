@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveMe, type Me } from '@/lib/useMe';
+import { NO_PIN_ROLES } from '@/lib/templates';
 
 type Person = { id: string; name: string; role: string; hasPin: boolean };
 
@@ -103,6 +104,7 @@ export default function Page() {
     <main className="mx-auto max-w-sm px-4 py-10">
       <p className="text-sm font-semibold uppercase tracking-widest text-brand">Eunifrance Schools</p>
       <h1 className="mt-1 text-3xl font-semibold text-brand-dark">Who are you?</h1>
+      {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
       {failed && <p role="alert" className="mt-6 text-red-700">Could not load names. Check your connection and refresh.</p>}
       {people && people.length === 0 && <p className="mt-6 text-muted">No names added yet.</p>}
       <ul className="mt-6 flex flex-col gap-3">
@@ -110,7 +112,7 @@ export default function Page() {
           <li key={p.id}>
             <button
               disabled={busy}
-              onClick={() => setAsking(p)}
+              onClick={() => (NO_PIN_ROLES.includes(p.role) ? enter(p, '', false) : setAsking(p))}
               className="flex min-h-14 w-full flex-col items-start justify-center rounded-md border border-brand/40 bg-white px-4 py-2 text-left"
             >
               <span className="text-base font-medium">{p.name}</span>

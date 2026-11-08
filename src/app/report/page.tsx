@@ -102,7 +102,7 @@ function FieldInput({ field, answers, set, error }: {
   );
 }
 
-const tabLabel = (t: Template) => (t.onRequest ? 'Duty report' : t.frequency === 'daily' ? 'Daily' : 'Weekly');
+const tabLabel = (t: Template) => (t.frequency === 'daily' ? 'Daily' : 'Weekly');
 
 export default function ReportPage() {
   const router = useRouter();

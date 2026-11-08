@@ -117,8 +117,6 @@ export default function TeamPage() {
   const monday = mondayOf(day);
   const weekDates = [0, 1, 2, 3, 4].map((i) => addDays(monday, i));
   const rows = (staff ?? []).flatMap((s) => expectedFor(s.role).map((t) => ({ s, t })));
-  const nameOf = (id: string) => (staff ?? []).find((s) => s.id === id)?.name ?? 'Staff';
-  const duty = subs.filter((x) => x.template === 'staff_on_duty' && x.period === day);
 
   function state(staffId: string, t: Template, date: string): 'done' | 'missing' | 'open' {
     const period = periodFor(t.frequency, date);
@@ -165,7 +163,7 @@ export default function TeamPage() {
           {view === 'week' ? `Week of ${prettyDate(monday)}` : prettyDate(day)}
         </p>
 
-        {staff && rows.length === 0 && duty.length === 0 && <p className="mt-6 text-muted">No staff yet.</p>}
+        {staff && rows.length === 0 && <p className="mt-6 text-muted">No staff yet.</p>}
 
         {view === 'week' ? (
           <div className="mt-4 overflow-x-auto border-y border-brand/20 bg-white">
@@ -243,39 +241,6 @@ export default function TeamPage() {
                 );
               })}
             </ul>
-
-            {duty.length > 0 && (
-              <section className="mt-8">
-                <h2 className="border-b border-brand/20 pb-1 text-sm font-semibold uppercase tracking-wide text-brand">
-                  Duty reports
-                </h2>
-                <ul className="divide-y divide-brand/20 border-b border-brand/20">
-                  {duty.map((x) => {
-                    const id = `duty|${x.staff_id}`;
-                    const isOpen = open === id;
-                    return (
-                      <li key={id} className="bg-white">
-                        <button
-                          onClick={() => setOpen(isOpen ? null : id)}
-                          className="flex min-h-14 w-full items-center justify-between gap-3 px-3 py-2 text-left"
-                        >
-                          <span className="text-base font-medium">{nameOf(x.staff_id)}</span>
-                          <span className="rounded bg-green-100 px-2 py-1 text-sm font-medium text-green-900">Submitted</span>
-                        </button>
-                        {isOpen && (
-                          <div className="px-3 pb-4">
-                            <p className="text-sm text-muted">
-                              {new Date(x.submitted_at).toLocaleString('en-GB', { timeZone: 'Africa/Lagos' })}
-                            </p>
-                            <Answers template="staff_on_duty" answers={x.answers} />
-                          </div>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            )}
           </>
         )}
       </main>

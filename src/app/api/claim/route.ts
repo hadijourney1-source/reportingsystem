@@ -1,11 +1,12 @@
 import { badNewPin, db, findStaff, READER_ROLES } from '@/lib/server';
+import { NO_PIN_ROLES } from '@/lib/templates';
 
 // First sign-in: a person with no PIN chooses their own.
 // The director and head of school cannot be claimed this way (they can read everyone's reports).
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const staff = await findStaff(body.staffId);
-  if (!staff || staff.pin || READER_ROLES.includes(staff.role)) {
+  if (!staff || staff.pin || READER_ROLES.includes(staff.role) || NO_PIN_ROLES.includes(staff.role)) {
     return Response.json({ error: 'This name already has a PIN.' }, { status: 403 });
   }
   const bad = badNewPin(body.newPin);

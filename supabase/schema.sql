@@ -7,7 +7,7 @@ create table staff (
   role text not null check (role in (
     'director', 'head_of_school', 'vice_principal', 'senior_teacher',
     'primary_unit_leader', 'nursery_unit_leader', 'operations_manager',
-    'admin_secretary', 'teacher'
+    'admin_secretary', 'teacher', 'staff_on_duty'
   )),
   reports_to uuid references staff(id),
   pin text                       -- chosen by each person on first sign-in; the director and head of school need one set here

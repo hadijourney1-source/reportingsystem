@@ -12,7 +12,6 @@ export type Template = {
   key: string;
   title: string;
   frequency: 'daily' | 'weekly';
-  onRequest?: boolean; // filled in when needed (e.g. duty day), never chased or marked missing
   reportsTo: string;
   sections: Section[];
 };
@@ -241,15 +240,8 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'Part B: School fees collection',
         fields: [
-          N('total_received', 'Total fees received today (₦)'),
-          N('bank_transfer', 'Bank transfer (₦)'),
-          N('pos', 'POS (₦)'),
-          N('cash', 'Cash (₦)'),
-          N('payers_n', 'Number of parents who paid'),
           Y('confirmed_bank', 'Payments confirmed against bank statement / alert'),
           Y('receipts_issued', 'Receipts issued for all payments'),
-          Y('platforms_updated', 'Payments updated on Eschool / Klacify / Tufee'),
-          yn('cash_lodged', 'Cash lodged to bank', 'yes', 'Amount (₦)'),
           L('unconfirmed', 'Unconfirmed / unidentified payments (parent, amount, date)'),
         ],
       },
@@ -784,7 +776,6 @@ export const TEMPLATES: Record<string, Template> = {
     key: 'staff_on_duty',
     title: 'Staff on Duty: Daily Report',
     frequency: 'daily',
-    onRequest: true,
     reportsTo: 'Head of School or Vice Principal',
     sections: [
       { title: 'Part A: Duty details', fields: [T('time_resumed', 'Time resumed for duty')] },
@@ -867,17 +858,16 @@ export const ROLE_REPORTS: Record<string, string[]> = {
   operations_manager: ['operations_manager_daily', 'operations_manager_weekly'],
   head_of_school: ['head_of_school_daily', 'head_of_school_weekly'],
   admin_secretary: ['admin_secretary_daily', 'admin_secretary_weekly'],
-  teacher: [],
+  // Two shared logins (Nursery & Primary, Secondary) file the daily duty report.
+  staff_on_duty: ['staff_on_duty'],
 };
 
-const DUTY_ROLES = ['teacher', 'senior_teacher'];
+// These shared logins sign in by tapping the name; no PIN.
+export const NO_PIN_ROLES = ['staff_on_duty'];
 
 // Reports a person is expected to submit (reminders, "Missing" marks).
 export const expectedFor = (role: string): Template[] =>
   (ROLE_REPORTS[role] ?? []).map((k) => TEMPLATES[k]).filter(Boolean);
 
-// Everything a person can open: expected reports, plus the duty report for teachers.
-export const reportsFor = (role: string): Template[] => [
-  ...expectedFor(role),
-  ...(DUTY_ROLES.includes(role) ? [TEMPLATES.staff_on_duty] : []),
-];
+// Everything a person can open.
+export const reportsFor = (role: string): Template[] => expectedFor(role);
