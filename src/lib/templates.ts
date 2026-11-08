@@ -218,7 +218,7 @@ export const TEMPLATES: Record<string, Template> = {
         ],
       },
       {
-        title: 'G. Tomorrow's priorities',
+        title: "G. Tomorrow's priorities",
         fields: [list('priorities', 'The three most important things for the nursery unit tomorrow')],
       },
       {
