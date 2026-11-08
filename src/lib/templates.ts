@@ -184,15 +184,15 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'C. Assessment and learning',
         fields: [
-          long('assessment', 'Assessment practices today: what was assessed and how'),
           long('progress', 'Any child whose learning progress is notably behind or ahead of peers', true),
-          yn('dear_time', 'DEAR time and water break followed as timetabled', 'no', 'Reason'),
+          yn('dear_time', 'DEAR time followed as timetabled', 'no', 'Reason'),
         ],
       },
       {
         title: 'D. Routines and daily structure',
         fields: [
           checks('routines', 'Class routines consistently in place (tick all that apply)', [
+            'Assembly time routine',
             'Toilet time routine (girls first)',
             'Break time routine',
             'Class entry and exit',
@@ -207,13 +207,12 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'E. Staff conduct and welfare',
         fields: [
           yn('staff_concern', 'Any staff conduct concern in the nursery today', 'yes'),
-          long('staff_support', 'Staff wellbeing or support needs', true),
+          long('staff_support', 'Details of the concern (staff name and class)', true),
         ],
       },
       {
         title: 'F. Parent engagement',
         fields: [
-          long('parent_interactions', 'Parent interactions of note today (gate, pick-up, communication)'),
           long('parent_feedback', 'Any parent concern or feedback relayed to the unit', true),
         ],
       },
