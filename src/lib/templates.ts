@@ -250,29 +250,14 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           N('debtors_contacted', 'Number of debtors contacted today'),
           L('reminders', 'Payment reminders sent (SMS / WhatsApp / call)'),
-          L('promises', 'Payment promises received (parent, learner, class, amount ₦, promised date)'),
-          L('plans', 'Instalment / payment plan requests (parent, learner, details)'),
-          L('policy_affected', 'Learners affected by fees policy today (name, class, action taken)'),
-        ],
-      },
-      {
-        title: 'Part D: Expenses and petty cash',
-        fields: [
-          N('petty_open', 'Petty cash opening balance (₦)'),
-          L('expenses', 'Expenses paid today (item, amount ₦, approved by)'),
-          Y('vouchers', 'Receipts / vouchers collected for all expenses'),
-          N('petty_close', 'Petty cash closing balance (₦)'),
         ],
       },
       {
         title: 'Part E: Facilities and support staff',
         fields: [
-          L('support_attendance', 'Support staff attendance (cleaners, security, drivers, kitchen)'),
           L('support_absent', 'Absent support staff (name, role, reason)'),
           L('facility_issues', 'Facility issues reported (location, issue)'),
           L('repairs', 'Repairs / maintenance done today'),
-          yn('power', 'Power / generator / water issues', 'yes', 'Details'),
-          yn('transport', 'School bus / transport issues', 'yes', 'Details'),
         ],
       },
       {
