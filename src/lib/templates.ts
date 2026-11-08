@@ -327,7 +327,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'Staff records and clock-in compliance',
         fields: [
           yn('clock_in', 'Full clock-in and clock-out compliance this week', 'no', 'Staff member(s) not compliant'),
-          yn('leave_email', 'All permission and leave requests received by email', 'no', 'Received verbally / WhatsApp from'),
+          yn('leave_email', 'All permission and requests received by email', 'no', 'Received verbally / WhatsApp from'),
           yn('records_change', 'Any change in staff records (new joining, departure, change in status)', 'yes', 'Details'),
         ],
       },
