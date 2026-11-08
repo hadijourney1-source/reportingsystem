@@ -281,19 +281,6 @@ export const TEMPLATES: Record<string, Template> = {
     sections: [
       { title: 'Term', fields: [{ id: 'week_of_term', type: 'number', label: 'Week of term', optional: true }] },
       {
-        title: 'Part A: Fees collection summary',
-        fields: [
-          N('expected', 'Total fees expected for the term (₦)'),
-          N('collected_total', 'Total collected to date (₦)'),
-          N('collected_week', 'Collected this week (₦)'),
-          NO('percent', 'Percentage collected to date (%)'),
-          N('outstanding', 'Outstanding balance (₦)'),
-          NO('nursery', 'Collection: Nursery (₦)'),
-          NO('primary', 'Collection: Primary (₦)'),
-          NO('academy', 'Collection: Academy (₦)'),
-        ],
-      },
-      {
         title: 'Part B: Debtors',
         fields: [
           N('debtors_n', 'Number of debtors'),
