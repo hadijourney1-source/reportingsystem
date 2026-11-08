@@ -130,6 +130,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           long('intervention', 'Critical and High Intervention students: update on each today'),
           long('new_concerns', 'New students showing academic concern, not previously flagged', true),
+          long('new_concerns_action', 'What was done about it?', true),
         ],
       },
       {
@@ -180,8 +181,8 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'B. Child welfare and safeguarding',
         fields: [
-          yn('welfare_concern', 'Any child welfare concern observed today (physical, emotional or social)'),
-          yn('foundational', 'Any child showing signs of early foundational difficulty (language, motor, attention, social)'),
+          yn('welfare_concern', 'Any child welfare concern observed today (physical, emotional or social)', 'yes'),
+          yn('foundational', 'Any child showing signs of early foundational difficulty (language, motor, attention, social)', 'yes', 'Name and class'),
           long('welfare_details', 'Details and observations (name and class of each child)', true),
         ],
       },
