@@ -5,7 +5,7 @@ import { saveMe, type Me } from '@/lib/useMe';
 
 type Person = { id: string; name: string; role: string; hasPin: boolean };
 
-const READERS = ['director', 'head_of_school', 'vice_principal'];
+const READERS = ['director', 'head_of_school', 'vice_principal', 'operations_manager'];
 const roleLabel = (r: string) => r.replace(/_/g, ' ');
 const box = 'min-h-12 rounded-md border border-brand/40 bg-white px-3 text-base';
 

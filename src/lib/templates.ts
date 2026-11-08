@@ -44,6 +44,7 @@ const T = (id: string, label: string): Field => text(id, label, true);
 const L = (id: string, label: string): Field => long(id, label, true);
 const LS = (id: string, label: string): Field => list(id, label, true);
 const N = (id: string, label: string): Field => num(id, label);
+const NO = (id: string, label: string): Field => ({ id, type: 'number', label, optional: true });
 const Y = (id: string, label: string): Field => yn(id, label);
 const YO = (id: string, label: string): Field => ({ id, type: 'yesno', label, optional: true });
 
@@ -223,56 +224,151 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
 
-  operations_manager: {
-    key: 'operations_manager',
-    title: 'Operations Manager: Accountability Report',
-    frequency: 'weekly',
+  operations_manager_daily: {
+    key: 'operations_manager_daily',
+    title: 'Operations Manager: Daily Report',
+    frequency: 'daily',
     reportsTo: 'Director',
     sections: [
       {
-        title: 'A. Fees and financial administration',
+        title: 'Part A: Report details',
         fields: [
-          num('families_outstanding', 'Number of families with outstanding fees this week'),
-          long('extension_status', 'Families on approved payment extension: status update', true),
-          yn('ext_requests', 'Fee payment extension requests received this week', 'yes', 'How many, and were all submitted by email?'),
-          long('fee_concerns', 'Any fee-related parent concern or dispute this week', true),
+          Y('as_reviewed', "Admin Secretary's daily report received and reviewed"),
+          Y('duty_received', 'Staff on Duty report received'),
         ],
       },
       {
-        title: 'B. Parent communications and first contact',
+        title: 'Part B: School fees collection',
         fields: [
-          num('parent_interactions', 'Number of parent interactions handled at the office this week'),
-          long('parent_queries', 'Parent concerns or queries raised this week (nature and how handled)'),
-          yn('difficult_parent', 'Any parent who was difficult, inappropriate, or requires Director awareness', 'yes', 'Name and summary'),
+          N('total_received', 'Total fees received today (₦)'),
+          N('bank_transfer', 'Bank transfer (₦)'),
+          N('pos', 'POS (₦)'),
+          N('cash', 'Cash (₦)'),
+          N('payers_n', 'Number of parents who paid'),
+          Y('confirmed_bank', 'Payments confirmed against bank statement / alert'),
+          Y('receipts_issued', 'Receipts issued for all payments'),
+          Y('platforms_updated', 'Payments updated on Eschool / Klacify / Tufee'),
+          yn('cash_lodged', 'Cash lodged to bank', 'yes', 'Amount (₦)'),
+          L('unconfirmed', 'Unconfirmed / unidentified payments (parent, amount, date)'),
         ],
       },
       {
-        title: 'C. Staff records and clock-in compliance',
+        title: 'Part C: Fees follow-up',
         fields: [
-          yn('clock_in', 'Full clock-in and clock-out compliance this week', 'no', 'Staff member(s) not compliant'),
-          yn('leave_email', 'All permission and leave requests received by email', 'no', 'Received verbally / WhatsApp from'),
-          yn('records_change', 'Any change in staff records (new joining, departure, change in status)', 'yes', 'Details'),
+          N('debtors_contacted', 'Number of debtors contacted today'),
+          L('reminders', 'Payment reminders sent (SMS / WhatsApp / call)'),
+          L('promises', 'Payment promises received (parent, learner, class, amount ₦, promised date)'),
+          L('plans', 'Instalment / payment plan requests (parent, learner, details)'),
+          L('policy_affected', 'Learners affected by fees policy today (name, class, action taken)'),
         ],
       },
       {
-        title: 'D. Facilities and materials',
+        title: 'Part D: Expenses and petty cash',
         fields: [
-          yn('facility', 'Any facility or maintenance issue reported or observed', 'yes', 'Details and status'),
-          yn('supplies', 'Any learning materials or supplies needing replenishment', 'yes', 'Items'),
-          yn('damage', 'Any property damage reported this week', 'yes', 'Student, and was the parent contacted?'),
+          N('petty_open', 'Petty cash opening balance (₦)'),
+          L('expenses', 'Expenses paid today (item, amount ₦, approved by)'),
+          Y('vouchers', 'Receipts / vouchers collected for all expenses'),
+          N('petty_close', 'Petty cash closing balance (₦)'),
         ],
       },
       {
-        title: 'E. Communications compliance',
+        title: 'Part E: Facilities and support staff',
         fields: [
-          list('comms_sent', 'Official school communications sent this week (letters, notices, parent letters)', true),
-          yn('comms_unapproved', 'Any communication sent without Director approval that should have been approved', 'yes', 'Details'),
+          L('support_attendance', 'Support staff attendance (cleaners, security, drivers, kitchen)'),
+          L('support_absent', 'Absent support staff (name, role, reason)'),
+          L('facility_issues', 'Facility issues reported (location, issue)'),
+          L('repairs', 'Repairs / maintenance done today'),
+          yn('power', 'Power / generator / water issues', 'yes', 'Details'),
+          yn('transport', 'School bus / transport issues', 'yes', 'Details'),
         ],
       },
       {
-        title: 'F. Anything requiring Director decision',
-        fields: [long('director_decision', 'Matters requiring Director awareness or decision (write N/A if none)')],
+        title: 'Part F: Admin office',
+        fields: [
+          L('complaints', "Parents' complaints escalated by Admin Secretary"),
+          L('handled', 'How did you handle it?'),
+          L('supplies', 'Stationery / supplies requested or issued'),
+          L('pending', 'Pending tasks carried over to tomorrow'),
+        ],
       },
+      closing,
+    ],
+  },
+
+  operations_manager_weekly: {
+    key: 'operations_manager_weekly',
+    title: 'Operations Manager: Weekly Report',
+    frequency: 'weekly',
+    reportsTo: 'Director',
+    sections: [
+      { title: 'Term', fields: [{ id: 'week_of_term', type: 'number', label: 'Week of term', optional: true }] },
+      {
+        title: 'Part A: Fees collection summary',
+        fields: [
+          N('expected', 'Total fees expected for the term (₦)'),
+          N('collected_total', 'Total collected to date (₦)'),
+          N('collected_week', 'Collected this week (₦)'),
+          NO('percent', 'Percentage collected to date (%)'),
+          N('outstanding', 'Outstanding balance (₦)'),
+          NO('nursery', 'Collection: Nursery (₦)'),
+          NO('primary', 'Collection: Primary (₦)'),
+          NO('academy', 'Collection: Academy (₦)'),
+        ],
+      },
+      {
+        title: 'Part B: Debtors',
+        fields: [
+          N('debtors_n', 'Number of debtors'),
+          L('top_debtors', 'Top debtors (learner, class, amount owed ₦, last contact)'),
+          L('promises_due', 'Payment promises due next week (parent, amount ₦, date)'),
+          L('broken', 'Broken promises this week (parent, amount ₦)'),
+          L('approved_plans', 'Approved payment plans (parent, learner, terms)'),
+        ],
+      },
+      {
+        title: 'Part C: Reconciliation',
+        fields: [
+          Y('reconciled', 'All payments reconciled with bank statement'),
+          L('unidentified', 'Unidentified payments still pending (amount ₦, date)'),
+          Y('receipts_match', 'Receipts issued match payments received'),
+          Y('platform_ok', 'Platform records up to date'),
+        ],
+      },
+      {
+        title: 'Part D: Expenses',
+        fields: [
+          N('expenses_total', 'Total expenses this week (₦)'),
+          L('major', 'Major expenses (item, amount ₦)'),
+          N('petty_end', 'Petty cash balance at week end (₦)'),
+          yn('unapproved', 'Items purchased without prior approval', 'yes', 'Details'),
+        ],
+      },
+      {
+        title: 'Part E: Facilities and support staff',
+        fields: [
+          L('repairs_done', 'Repairs completed this week'),
+          L('repairs_pending', 'Repairs still pending (issue, since when)'),
+          L('staff_concerns', 'Support staff concerns (name, role, issue)'),
+          L('vendor', 'Vendor / supplier issues'),
+        ],
+      },
+      {
+        title: 'Part F: Admin office',
+        fields: [
+          Y('as_weekly_reviewed', "Admin Secretary's weekly report reviewed"),
+          L('enquiries_vs', 'Enquiries vs enrolments this week'),
+          L('complaints_open', "Parents' complaints still open"),
+        ],
+      },
+      {
+        title: 'Part G: Look ahead',
+        fields: [
+          L('fees_drive', 'Planned fees drive next week'),
+          NO('expected_expenses', 'Expected expenses next week (₦)'),
+          L('resources', 'Resources needed'),
+        ],
+      },
+      closing,
     ],
   },
 
@@ -703,7 +799,7 @@ export const ROLE_REPORTS: Record<string, string[]> = {
   vice_principal: ['vice_principal_daily', 'vice_principal_weekly'],
   primary_unit_leader: ['primary_unit_leader'],
   nursery_unit_leader: ['nursery_unit_leader'],
-  operations_manager: ['operations_manager'],
+  operations_manager: ['operations_manager_daily', 'operations_manager_weekly'],
   head_of_school: ['head_of_school_daily', 'head_of_school_weekly'],
   admin_secretary: ['admin_secretary_daily', 'admin_secretary_weekly'],
   teacher: [],

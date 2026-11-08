@@ -15,7 +15,7 @@ type Sub = {
   submitted_at: string;
 };
 
-const READERS = ['director', 'head_of_school', 'vice_principal'];
+const READERS = ['director', 'head_of_school', 'vice_principal', 'operations_manager'];
 const roleLabel = (r: string) => r.replace(/_/g, ' ');
 const kind = (t: Template) => (t.frequency === 'daily' ? 'Daily report' : 'Weekly report');
 const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];

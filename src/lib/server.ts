@@ -6,7 +6,7 @@ export const db = () =>
     auth: { persistSession: false },
   });
 
-export const READER_ROLES = ['director', 'head_of_school', 'vice_principal'];
+export const READER_ROLES = ['director', 'head_of_school', 'vice_principal', 'operations_manager'];
 export const isDate = (s: unknown): s is string => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
 export const isId = (s: unknown): s is string =>
   typeof s === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);

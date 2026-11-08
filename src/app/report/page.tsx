@@ -51,7 +51,7 @@ function FieldInput({ field, answers, set, error }: {
 
       {field.type === 'text' && <input className={input} value={str} onChange={(e) => set(field.id, e.target.value)} />}
       {field.type === 'number' && (
-        <input className={input} type="number" inputMode="numeric" min={0} value={str} onChange={(e) => set(field.id, e.target.value)} />
+        <input className={input} type="number" inputMode="decimal" step="any" min={0} value={str} onChange={(e) => set(field.id, e.target.value)} />
       )}
       {field.type === 'date' && <input className={input} type="date" value={str} onChange={(e) => set(field.id, e.target.value)} />}
       {field.type === 'long' && (
