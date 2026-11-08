@@ -233,7 +233,8 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'Part A: Report details',
         fields: [
-          Y('as_reviewed', "Admin Secretary's daily report received and reviewed"),
+          Y('as_reviewed_np', "Admin Secretary's (Nursery & Primary) daily report received and reviewed"),
+          Y('as_reviewed_sec', "Admin Secretary's (Secondary) daily report received and reviewed"),
           Y('duty_received', 'Staff on Duty report received'),
         ],
       },
@@ -355,7 +356,8 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'Part F: Admin office',
         fields: [
-          Y('as_weekly_reviewed', "Admin Secretary's weekly report reviewed"),
+          Y('as_weekly_reviewed_np', "Admin Secretary's (Nursery & Primary) weekly report reviewed"),
+          Y('as_weekly_reviewed_sec', "Admin Secretary's (Secondary) weekly report reviewed"),
           L('enquiries_vs', 'Enquiries vs enrolments this week'),
           L('complaints_open', "Parents' complaints still open"),
         ],
