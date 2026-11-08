@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
 import { TEMPLATES } from '@/lib/templates';
-import { mondayOf, periodFor, prettyDate, todayLagos } from '@/lib/period';
+import { mondayOf, periodFor, prettyDate, todayLagos, weekday } from '@/lib/period';
 
 type StaffRow = { id: string; name: string; role: string };
 type Sub = { staff_id: string; period: string; answers: Record<string, string | string[]>; submitted_at: string };
@@ -49,39 +49,67 @@ export default function TeamPage() {
   const [subs, setSubs] = useState<Sub[]>([]);
   const [open, setOpen] = useState<string | null>(null);
   const [today, setToday] = useState('');
-  useEffect(() => setToday(todayLagos()), []);
+  const [day, setDay] = useState('');
+  useEffect(() => {
+    const t = todayLagos();
+    setToday(t);
+    setDay(t);
+  }, []);
 
   useEffect(() => {
     if (me && !['director', 'head_of_school'].includes(me.role)) router.replace('/report');
   }, [me, router]);
 
   useEffect(() => {
-    if (!me || !today || !['director', 'head_of_school'].includes(me.role)) return;
+    if (!me || !day || !['director', 'head_of_school'].includes(me.role)) return;
+    setOpen(null);
     fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ staffId: me.id, pin: me.pin, periods: [today, mondayOf(today)] }),
+      body: JSON.stringify({ staffId: me.id, pin: me.pin, periods: [day, mondayOf(day)] }),
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => { setStaff(d.staff); setSubs(d.subs); })
       .catch(() => setStaff([]));
-  }, [me, today]);
+  }, [me, day]);
 
-  if (!me || !today) return null;
+  if (!me || !today || !day) return null;
+
+  const step = (n: number) => {
+    const d = new Date(day + 'T12:00:00Z');
+    d.setUTCDate(d.getUTCDate() + n);
+    const next = d.toISOString().slice(0, 10);
+    if (next <= today) setDay(next);
+  };
 
   return (
     <>
       <Header me={me} />
       <main className="mx-auto max-w-2xl px-4 py-6">
         <h1 className="text-2xl font-semibold text-brand-dark">Team</h1>
-        <p className="mt-1 text-sm text-muted">{prettyDate(today)}</p>
+        <div className="mt-3 flex items-center gap-2">
+          <button onClick={() => step(-1)} aria-label="Previous day" className="min-h-11 min-w-11 rounded-md border border-brand/40 bg-white text-lg">‹</button>
+          <input
+            type="date" value={day} max={today}
+            onChange={(e) => e.target.value && e.target.value <= today && setDay(e.target.value)}
+            className="min-h-11 flex-1 rounded-md border border-brand/40 bg-white px-3 text-base"
+          />
+          <button onClick={() => step(1)} disabled={day >= today} aria-label="Next day" className="min-h-11 min-w-11 rounded-md border border-brand/40 bg-white text-lg disabled:opacity-40">›</button>
+          {day !== today && (
+            <button onClick={() => setDay(today)} className="min-h-11 rounded-md border border-brand/40 bg-white px-3 text-sm">Today</button>
+          )}
+        </div>
+        <p className="mt-2 text-sm text-muted">{prettyDate(day)}</p>
 
         {staff && staff.length === 0 && <p className="mt-6 text-muted">No staff yet.</p>}
 
         <ul className="mt-4 divide-y divide-brand/20 border-y border-brand/20">
           {(staff ?? []).map((s) => {
             const t = TEMPLATES[s.role];
-            const sub = subs.find((x) => x.staff_id === s.id && x.period === periodFor(t.frequency, today));
+            const period = periodFor(t.frequency, day);
+            const sub = subs.find((x) => x.staff_id === s.id && x.period === period);
+            const weekend = t.frequency === 'daily' && weekday(day) >= 6;
+            const missed = !sub && !weekend && period < periodFor(t.frequency, today);
             const isOpen = open === s.id;
             return (
               <li key={s.id} className="bg-white">
@@ -96,8 +124,8 @@ export default function TeamPage() {
                       {roleLabel(s.role)} · {t.frequency}
                     </span>
                   </span>
-                  <span className={`rounded px-2 py-1 text-sm font-medium ${sub ? 'bg-green-100 text-green-900' : 'bg-brand/10 text-muted'}`}>
-                    {sub ? 'Submitted' : 'Not yet'}
+                  <span className={`rounded px-2 py-1 text-sm font-medium ${sub ? 'bg-green-100 text-green-900' : missed ? 'bg-red-100 text-red-900' : 'bg-brand/10 text-muted'}`}>
+                    {sub ? 'Submitted' : missed ? 'Missing' : weekend ? 'Weekend' : 'Not yet'}
                   </span>
                 </button>
                 {sub && isOpen && (
