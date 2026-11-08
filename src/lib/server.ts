@@ -19,8 +19,7 @@ export async function findStaff(id: unknown): Promise<StaffRow | null> {
   return (data as StaffRow) ?? null;
 }
 
-// Readers (director, head of school) must give their PIN; everyone else just picks their name.
+// Everyone has their own PIN. A person with no PIN set cannot sign in.
 export function pinOk(staff: StaffRow, pin: unknown): boolean {
-  if (!READER_ROLES.includes(staff.role)) return true;
   return !!staff.pin && typeof pin === 'string' && pin === staff.pin;
 }

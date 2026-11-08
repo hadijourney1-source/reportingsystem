@@ -122,7 +122,7 @@ export default function ReportPage() {
 
   useEffect(() => {
     if (!me || !template || !period) return;
-    fetch(`/api/report?staffId=${me.id}&period=${period}`)
+    fetch(`/api/report?staffId=${me.id}&period=${period}`, { headers: { 'x-pin': me.pin ?? '' } })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data) {
@@ -173,7 +173,7 @@ export default function ReportPage() {
     const res = await fetch('/api/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ staffId: me!.id, period, answers }),
+      body: JSON.stringify({ staffId: me!.id, pin: me!.pin, period, answers }),
     }).catch(() => null);
     setBusy(false);
     if (!res || !res.ok) return setMessage('Could not submit. Check your connection and try again.');

@@ -5,7 +5,6 @@ import { saveMe, type Me } from '@/lib/useMe';
 
 type Person = { id: string; name: string; role: string };
 
-const READERS = ['director', 'head_of_school'];
 const roleLabel = (r: string) => r.replace(/_/g, ' ');
 
 export default function Page() {
@@ -78,11 +77,13 @@ export default function Page() {
           <li key={p.id}>
             <button
               disabled={busy}
-              onClick={() => (READERS.includes(p.role) ? setAsking(p) : choose(p))}
+              onClick={() => setAsking(p)}
               className="flex min-h-14 w-full flex-col items-start justify-center rounded-md border border-brand/40 bg-white px-4 py-2 text-left"
             >
               <span className="text-base font-medium">{p.name}</span>
-              <span className="text-sm capitalize text-muted">{roleLabel(p.role)}</span>
+              {p.name.toLowerCase() !== roleLabel(p.role) && (
+                <span className="text-sm capitalize text-muted">{roleLabel(p.role)}</span>
+              )}
             </button>
           </li>
         ))}

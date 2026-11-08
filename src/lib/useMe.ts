@@ -17,7 +17,11 @@ export function useMe(): Me | null {
   useEffect(() => {
     try {
       const raw = localStorage.getItem(KEY);
-      if (raw) return setMe(JSON.parse(raw) as Me);
+      if (raw) {
+        const saved = JSON.parse(raw) as Me;
+        if (saved.pin) return setMe(saved);
+        clearMe();
+      }
     } catch {}
     router.replace('/');
   }, [router]);

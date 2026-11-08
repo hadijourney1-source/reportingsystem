@@ -1,4 +1,4 @@
-import { db, findStaff, isDate, isId } from '@/lib/server';
+import { db, findStaff, isDate, isId, pinOk } from '@/lib/server';
 import { TEMPLATES } from '@/lib/templates';
 
 export async function GET(req: Request) {
@@ -6,6 +6,8 @@ export async function GET(req: Request) {
   const staffId = url.searchParams.get('staffId');
   const period = url.searchParams.get('period');
   if (!isId(staffId) || !isDate(period)) return Response.json({ error: 'Bad request.' }, { status: 400 });
+  const who = await findStaff(staffId);
+  if (!who || !pinOk(who, req.headers.get('x-pin'))) return Response.json({ error: 'Not allowed.' }, { status: 403 });
   const { data } = await db().from('submissions').select('answers, submitted_at')
     .eq('staff_id', staffId).eq('period', period).maybeSingle();
   return Response.json(data ?? null);
@@ -15,6 +17,7 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const staff = await findStaff(body.staffId);
   const template = staff && TEMPLATES[staff.role];
+  if (staff && !pinOk(staff, body.pin)) return Response.json({ error: 'Not allowed.' }, { status: 403 });
   if (!staff || !template || !isDate(body.period) || typeof body.answers !== 'object' || body.answers === null) {
     return Response.json({ error: 'Bad request.' }, { status: 400 });
   }
