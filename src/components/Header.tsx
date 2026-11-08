@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { clearMe, type Me } from '@/lib/useMe';
 
-const READERS = ['director', 'head_of_school'];
+const READERS = ['director', 'head_of_school', 'vice_principal'];
 
 export function Header({ me }: { me: Me }) {
   const router = useRouter();

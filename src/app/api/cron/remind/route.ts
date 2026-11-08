@@ -1,6 +1,6 @@
 import * as webpush from 'web-push';
 import { db } from '@/lib/server';
-import { TEMPLATES } from '@/lib/templates';
+import { expectedFor } from '@/lib/templates';
 import { periodFor, weekday } from '@/lib/period';
 
 // Called by Vercel Cron at 15:00 Lagos time, Monday to Friday.
@@ -26,28 +26,29 @@ export async function GET(req: Request) {
     staff: { id: string; name: string; role: string } | null;
   }[];
 
-  // Daily reporters are reminded every weekday; weekly reporters on Friday.
-  const due = rows.filter((r) => {
-    const t = r.staff && TEMPLATES[r.staff.role];
-    return t && (t.frequency === 'daily' || isFriday);
-  });
+  // Daily reports are chased every weekday; weekly reports on Friday. Duty reports are never chased.
+  const pendingFor = (role: string) =>
+    expectedFor(role).filter((t) => t.frequency === 'daily' || isFriday);
+  const due = rows.filter((r) => r.staff && pendingFor(r.staff.role).length > 0);
   if (!due.length) return Response.json({ sent: 0 });
 
   const staffIds = [...new Set(due.map((r) => r.staff!.id))];
-  const { data: done } = await supabase.from('submissions').select('staff_id, period')
+  const { data: done } = await supabase.from('submissions').select('staff_id, template, period')
     .in('staff_id', staffIds).in('period', [periodFor('daily', today), periodFor('weekly', today)]);
-  const submitted = new Set((done ?? []).map((d) => `${d.staff_id}|${d.period}`));
+  const submitted = new Set((done ?? []).map((d) => `${d.staff_id}|${d.template}|${d.period}`));
 
   let sent = 0;
   for (const r of due) {
-    const t = TEMPLATES[r.staff!.role];
-    if (submitted.has(`${r.staff!.id}|${periodFor(t.frequency, today)}`)) continue;
+    const missing = pendingFor(r.staff!.role)
+      .filter((t) => !submitted.has(`${r.staff!.id}|${t.key}|${periodFor(t.frequency, today)}`));
+    if (!missing.length) continue;
+    const kinds = missing.map((t) => (t.frequency === 'daily' ? "today's" : "this week's"));
     try {
       await webpush.sendNotification(
         { endpoint: r.endpoint, keys: { p256dh: r.p256dh, auth: r.auth } },
         JSON.stringify({
           title: 'Report reminder',
-          body: t.frequency === 'daily' ? "Today's report is not in yet." : "This week's report is not in yet.",
+          body: `${kinds.join(' and ')} report ${missing.length > 1 ? 'are' : 'is'} not in yet.`.replace(/^./, (c) => c.toUpperCase()),
           url: '/report',
         })
       );

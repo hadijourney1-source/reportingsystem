@@ -1,24 +1,28 @@
 import { db, findStaff, isDate, isId, pinOk } from '@/lib/server';
-import { TEMPLATES } from '@/lib/templates';
+import { reportsFor } from '@/lib/templates';
+
+const allowed = (role: string, key: unknown) => typeof key === 'string' && reportsFor(role).some((t) => t.key === key);
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const staffId = url.searchParams.get('staffId');
   const period = url.searchParams.get('period');
+  const template = url.searchParams.get('template');
   if (!isId(staffId) || !isDate(period)) return Response.json({ error: 'Bad request.' }, { status: 400 });
   const who = await findStaff(staffId);
   if (!who || !pinOk(who, req.headers.get('x-pin'))) return Response.json({ error: 'Not allowed.' }, { status: 403 });
+  if (!allowed(who.role, template)) return Response.json({ error: 'Bad request.' }, { status: 400 });
   const { data } = await db().from('submissions').select('answers, submitted_at')
-    .eq('staff_id', staffId).eq('period', period).maybeSingle();
+    .eq('staff_id', staffId).eq('template', template!).eq('period', period).maybeSingle();
   return Response.json(data ?? null);
 }
 
 export async function POST(req: Request) {
   const body = await req.json().catch(() => ({}));
   const staff = await findStaff(body.staffId);
-  const template = staff && TEMPLATES[staff.role];
   if (staff && !pinOk(staff, body.pin)) return Response.json({ error: 'Not allowed.' }, { status: 403 });
-  if (!staff || !template || !isDate(body.period) || typeof body.answers !== 'object' || body.answers === null) {
+  if (!staff || !allowed(staff.role, body.template) || !isDate(body.period)
+      || typeof body.answers !== 'object' || body.answers === null) {
     return Response.json({ error: 'Bad request.' }, { status: 400 });
   }
   if (JSON.stringify(body.answers).length > 100_000) {
@@ -26,8 +30,8 @@ export async function POST(req: Request) {
   }
   const submitted_at = new Date().toISOString();
   const { error } = await db().from('submissions').upsert(
-    { staff_id: staff.id, template: template.key, period: body.period, answers: body.answers, submitted_at },
-    { onConflict: 'staff_id,period' }
+    { staff_id: staff.id, template: body.template, period: body.period, answers: body.answers, submitted_at },
+    { onConflict: 'staff_id,template,period' }
   );
   if (error) return Response.json({ error: 'Could not save.' }, { status: 500 });
   return Response.json({ submitted_at });

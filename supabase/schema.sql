@@ -6,7 +6,8 @@ create table staff (
   name text not null,
   role text not null check (role in (
     'director', 'head_of_school', 'vice_principal', 'senior_teacher',
-    'primary_unit_leader', 'nursery_unit_leader', 'operations_manager'
+    'primary_unit_leader', 'nursery_unit_leader', 'operations_manager',
+    'admin_secretary', 'teacher'
   )),
   reports_to uuid references staff(id),
   pin text                       -- chosen by each person on first sign-in; the director and head of school need one set here
@@ -15,11 +16,11 @@ create table staff (
 create table submissions (
   id uuid primary key default gen_random_uuid(),
   staff_id uuid not null references staff(id) on delete cascade,
-  template text not null,
+  template text not null,        -- which report, e.g. head_of_school_daily
   period date not null,          -- the day (daily reports) or the Monday of the week (weekly reports)
   answers jsonb not null,
   submitted_at timestamptz not null default now(),
-  unique (staff_id, period)
+  unique (staff_id, template, period)
 );
 
 -- Row level security ON with no policies = nobody can touch these tables with the public key.

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
 import { ReminderToggle } from '@/components/ReminderToggle';
-import { TEMPLATES, type Field } from '@/lib/templates';
+import { reportsFor, type Field, type Template } from '@/lib/templates';
 import { periodFor, prettyDate, todayLagos, weekday } from '@/lib/period';
 
 type Answers = Record<string, string | string[]>;
@@ -102,6 +102,8 @@ function FieldInput({ field, answers, set, error }: {
   );
 }
 
+const tabLabel = (t: Template) => (t.onRequest ? 'Duty report' : t.frequency === 'daily' ? 'Daily' : 'Weekly');
+
 export default function ReportPage() {
   const router = useRouter();
   const me = useMe();
@@ -111,32 +113,42 @@ export default function ReportPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState('');
+  const [pickedKey, setPickedKey] = useState<string | null>(null);
 
-  const template = me ? TEMPLATES[me.role] : undefined;
+  const reports = me ? reportsFor(me.role) : [];
+  const template = reports.find((t) => t.key === pickedKey) ?? reports[0];
   const [today, setToday] = useState('');
   useEffect(() => setToday(todayLagos()), []);
   const period = template && today ? periodFor(template.frequency, today) : '';
 
   useEffect(() => {
-    if (me?.role === 'director') router.replace('/team');
-  }, [me, router]);
+    if (me && reports.length === 0) router.replace('/team');
+  }, [me, reports.length, router]);
 
+  const key = template?.key;
   useEffect(() => {
-    if (!me || !template || !period) return;
-    fetch(`/api/report?staffId=${me.id}&period=${period}`, { headers: { 'x-pin': me.pin ?? '' } })
+    if (!me || !key || !period) return;
+    let current = true;
+    setLoaded(false);
+    setAnswers({});
+    setSavedAt(null);
+    setErrors({});
+    setMessage('');
+    fetch(`/api/report?staffId=${me.id}&template=${key}&period=${period}`, { headers: { 'x-pin': me.pin ?? '' } })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
+        if (!current) return;
         if (data) {
           setAnswers(data.answers as Answers);
           setSavedAt(data.submitted_at);
         }
         setLoaded(true);
       })
-      .catch(() => setLoaded(true));
-  }, [me, template, period]);
+      .catch(() => current && setLoaded(true));
+    return () => { current = false; };
+  }, [me, key, period]);
 
-  if (!me || !today) return null;
-  if (!template) return <><Header me={me} /><p className="p-4">No report for your role.</p></>;
+  if (!me || !today || !template) return null;
 
   const sections = template.sections.filter((s) => !s.days || s.days.includes(weekday(today)));
 
@@ -174,7 +186,7 @@ export default function ReportPage() {
     const res = await fetch('/api/report', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ staffId: me!.id, pin: me!.pin, period, answers }),
+      body: JSON.stringify({ staffId: me!.id, pin: me!.pin, template: template!.key, period, answers }),
     }).catch(() => null);
     setBusy(false);
     if (!res || !res.ok) return setMessage('Could not submit. Check your connection and try again.');
@@ -187,6 +199,20 @@ export default function ReportPage() {
     <>
       <Header me={me} />
       <main className="mx-auto max-w-2xl px-4 py-6">
+        {reports.length > 1 && (
+          <div className="mb-4 flex gap-2" role="tablist">
+            {reports.map((t) => (
+              <button
+                key={t.key} role="tab" aria-selected={t.key === template.key} onClick={() => setPickedKey(t.key)}
+                className={`min-h-11 flex-1 rounded-md border text-base font-medium ${
+                  t.key === template.key ? 'border-brand bg-brand text-white' : 'border-brand/40 bg-white'
+                }`}
+              >
+                {tabLabel(t)}
+              </button>
+            ))}
+          </div>
+        )}
         <h1 className="text-2xl font-semibold text-brand-dark">{template.title}</h1>
         <p className="mt-1 text-sm text-muted">
           {template.frequency === 'daily' ? prettyDate(today) : `Week of ${prettyDate(period)}`} · to {template.reportsTo}
