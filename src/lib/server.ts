@@ -23,3 +23,13 @@ export async function findStaff(id: unknown): Promise<StaffRow | null> {
 export function pinOk(staff: StaffRow, pin: unknown): boolean {
   return !!staff.pin && typeof pin === 'string' && pin === staff.pin;
 }
+
+const WEAK_PINS = ['1234', '123456', '12345678', '4321', '654321', '1212', '0123'];
+
+// Returns a message if the PIN is not acceptable, or null when it is fine.
+export function badNewPin(next: unknown, old?: string | null): string | null {
+  if (typeof next !== 'string' || !/^\d{4,8}$/.test(next)) return 'Use 4 to 8 digits.';
+  if (old && next === old) return 'Choose a different PIN.';
+  if (/^(\d)\1+$/.test(next) || WEAK_PINS.includes(next)) return 'That PIN is too easy to guess.';
+  return null;
+}

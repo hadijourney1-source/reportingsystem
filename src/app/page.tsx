@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { saveMe, type Me } from '@/lib/useMe';
 
-type Person = { id: string; name: string; role: string };
+type Person = { id: string; name: string; role: string; hasPin: boolean };
 
+const READERS = ['director', 'head_of_school'];
 const roleLabel = (r: string) => r.replace(/_/g, ' ');
+const box = 'min-h-12 rounded-md border border-brand/40 bg-white px-3 text-base';
 
 export default function Page() {
   const router = useRouter();
@@ -13,6 +15,7 @@ export default function Page() {
   const [failed, setFailed] = useState(false);
   const [asking, setAsking] = useState<Person | null>(null);
   const [pin, setPin] = useState('');
+  const [again, setAgain] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -26,42 +29,72 @@ export default function Page() {
       .catch(() => setFailed(true));
   }, [router]);
 
-  async function choose(p: Person, pinValue?: string) {
+  function back() {
+    setAsking(null);
+    setPin('');
+    setAgain('');
+    setError('');
+  }
+
+  async function enter(p: Person, pinValue: string, claim: boolean) {
     setBusy(true);
     setError('');
-    const res = await fetch('/api/me', {
+    const res = await fetch(claim ? '/api/claim' : '/api/me', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ staffId: p.id, pin: pinValue }),
-    });
+      body: JSON.stringify(claim ? { staffId: p.id, newPin: pinValue } : { staffId: p.id, pin: pinValue }),
+    }).catch(() => null);
     setBusy(false);
-    if (!res.ok) return setError('Wrong PIN.');
-    const me = (await res.json()) as Me;
-    saveMe(pinValue ? { ...me, pin: pinValue } : me);
+    if (!res) return setError('Check your connection and try again.');
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return setError(data.error ?? 'Wrong PIN.');
+    const me = data as Me;
+    saveMe({ ...me, pin: pinValue });
     router.replace(me.role === 'director' ? '/team' : '/report');
   }
 
   if (asking) {
+    const claiming = !asking.hasPin && !READERS.includes(asking.role);
+    const blocked = !asking.hasPin && READERS.includes(asking.role);
+
     return (
       <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-4 px-4">
         <h1 className="text-2xl font-semibold text-brand-dark">{asking.name}</h1>
-        <form
-          onSubmit={(e) => { e.preventDefault(); choose(asking, pin); }}
-          className="flex flex-col gap-4"
-        >
-          <input
-            type="password" inputMode="numeric" autoFocus placeholder="PIN" value={pin}
-            onChange={(e) => setPin(e.target.value)}
-            className="min-h-12 rounded-md border border-brand/40 bg-white px-3 text-base"
-          />
-          {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-          <button disabled={busy} className="min-h-12 rounded-md bg-brand px-4 text-base font-medium text-white disabled:opacity-60">
-            Continue
-          </button>
-          <button type="button" onClick={() => { setAsking(null); setPin(''); setError(''); }} className="min-h-12 text-base text-muted">
-            Back
-          </button>
-        </form>
+        {blocked ? (
+          <p className="text-base text-muted">No PIN has been set for this person yet. Ask the administrator.</p>
+        ) : (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (claiming) {
+                if (!/^\d{4,8}$/.test(pin)) return setError('Use 4 to 8 digits.');
+                if (pin !== again) return setError('The PINs do not match.');
+              }
+              enter(asking, pin, claiming);
+            }}
+            className="flex flex-col gap-4"
+          >
+            {claiming && <p className="text-base text-muted">Choose a PIN you will remember.</p>}
+            <input
+              type="password" inputMode="numeric" autoFocus autoComplete="off"
+              placeholder={claiming ? 'Choose a PIN (4 to 8 digits)' : 'PIN'} value={pin}
+              onChange={(e) => setPin(e.target.value)} className={box}
+            />
+            {claiming && (
+              <input
+                type="password" inputMode="numeric" autoComplete="off" placeholder="PIN again" value={again}
+                onChange={(e) => setAgain(e.target.value)} className={box}
+              />
+            )}
+            {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+            <button disabled={busy} className="min-h-12 rounded-md bg-brand px-4 text-base font-medium text-white disabled:opacity-60">
+              {claiming ? 'Save PIN and continue' : 'Continue'}
+            </button>
+          </form>
+        )}
+        <button type="button" onClick={back} className="min-h-12 text-base text-muted">
+          Back
+        </button>
       </main>
     );
   }

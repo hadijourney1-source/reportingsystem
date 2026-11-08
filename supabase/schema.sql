@@ -9,7 +9,7 @@ create table staff (
     'primary_unit_leader', 'nursery_unit_leader', 'operations_manager'
   )),
   reports_to uuid references staff(id),
-  pin text                       -- each person's own PIN; without one they cannot sign in
+  pin text                       -- chosen by each person on first sign-in; the director and head of school need one set here
 );
 
 create table submissions (
@@ -27,12 +27,12 @@ alter table staff enable row level security;
 alter table submissions enable row level security;
 
 -- ---- Add your people (edit names/roles, then run) ----
-insert into staff (name, role, pin) values
-  ('Test Senior Teacher', 'senior_teacher', '3333'),
-  ('Test Vice Principal', 'vice_principal', '4444'),
-  ('Test Primary Unit Leader', 'primary_unit_leader', '5555'),
-  ('Test Nursery Unit Leader', 'nursery_unit_leader', '6666'),
-  ('Test Operations Manager', 'operations_manager', '7777');
+insert into staff (name, role) values
+  ('Test Senior Teacher', 'senior_teacher'),
+  ('Test Vice Principal', 'vice_principal'),
+  ('Test Primary Unit Leader', 'primary_unit_leader'),
+  ('Test Nursery Unit Leader', 'nursery_unit_leader'),
+  ('Test Operations Manager', 'operations_manager');
 
 insert into staff (name, role, pin) values
   ('Test Head of School', 'head_of_school', '1111'),
