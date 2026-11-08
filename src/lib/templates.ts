@@ -160,18 +160,23 @@ export const TEMPLATES: Record<string, Template> = {
   nursery_unit_leader: {
     key: 'nursery_unit_leader',
     title: 'Nursery Unit Leader: Accountability Report',
-    frequency: 'weekly',
+    frequency: 'daily',
     reportsTo: 'Head of School',
     sections: [
-      weekSummary('nursery unit', [
-        'Excellent: settled and on-routine',
-        'Good: minor issues managed',
-        'Challenging: needs attention',
-      ]),
+      {
+        title: 'A. Day summary',
+        fields: [
+          choice('tone', 'Overall tone of the nursery unit today', [
+            'Excellent: settled and on-routine',
+            'Good: minor issues managed',
+            'Challenging: needs attention',
+          ]),
+        ],
+      },
       {
         title: 'B. Child welfare and safeguarding',
         fields: [
-          yn('welfare_concern', 'Any child welfare concern observed this week (physical, emotional or social)', 'yes'),
+          yn('welfare_concern', 'Any child welfare concern observed today (physical, emotional or social)', 'yes'),
           yn('foundational', 'Any child showing signs of early foundational difficulty (language, motor, attention, social)', 'yes', 'Name and class'),
           long('welfare_details', 'Details and observations', true),
         ],
@@ -179,7 +184,7 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'C. Assessment and learning',
         fields: [
-          long('assessment', 'Assessment practices this week: what was assessed and how'),
+          long('assessment', 'Assessment practices today: what was assessed and how'),
           long('progress', 'Any child whose learning progress is notably behind or ahead of peers', true),
           yn('dear_time', 'DEAR time and water break followed as timetabled', 'no', 'Reason'),
         ],
@@ -201,20 +206,20 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'E. Staff conduct and welfare',
         fields: [
-          yn('staff_concern', 'Any staff conduct concern in the nursery this week', 'yes'),
+          yn('staff_concern', 'Any staff conduct concern in the nursery today', 'yes'),
           long('staff_support', 'Staff wellbeing or support needs', true),
         ],
       },
       {
         title: 'F. Parent engagement',
         fields: [
-          long('parent_interactions', 'Parent interactions of note this week (gate, pick-up, communication)'),
+          long('parent_interactions', 'Parent interactions of note today (gate, pick-up, communication)'),
           long('parent_feedback', 'Any parent concern or feedback relayed to the unit', true),
         ],
       },
       {
-        title: 'G. Next week priorities',
-        fields: [list('priorities', 'The three most important things for the nursery unit next week')],
+        title: 'G. Tomorrow's priorities',
+        fields: [list('priorities', 'The three most important things for the nursery unit tomorrow')],
       },
       {
         title: 'H. Escalation to Head of School',
