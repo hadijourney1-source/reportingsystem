@@ -104,51 +104,56 @@ export const TEMPLATES: Record<string, Template> = {
   primary_unit_leader: {
     key: 'primary_unit_leader',
     title: 'Primary Unit Leader: Accountability Report',
-    frequency: 'weekly',
+    frequency: 'daily',
     reportsTo: 'Head of School',
     sections: [
-      weekSummary('primary unit', [
-        'Excellent: all systems running',
-        'Good: minor issues managed',
-        'Challenging: escalation needed',
-      ]),
+      {
+        title: 'A. Day summary',
+        fields: [
+          choice('tone', 'Overall tone of the primary unit today', [
+            'Excellent: all systems running',
+            'Good: minor issues managed',
+            'Challenging: escalation needed',
+          ]),
+        ],
+      },
       {
         title: 'B. Teaching and learning',
         fields: [
-          list('observations', 'Lesson observations conducted this week (teacher, class, brief finding)'),
-          yn('scheme_ok', 'All teaching was on-scheme this week', 'no', 'Concerns found'),
+          list('observations', 'Lesson observations conducted today (teacher, class, brief finding)'),
+          yn('scheme_ok', 'All teaching was on-scheme today', 'no', 'Concerns found'),
           yn('plans_ok', 'Lesson plans submitted by all primary teachers', 'no', 'Missing from'),
         ],
       },
       {
         title: 'C. Student performance and intervention',
         fields: [
-          long('intervention', 'Critical and High Intervention students: update on each this week'),
+          long('intervention', 'Critical and High Intervention students: update on each today'),
           long('new_concerns', 'New students showing academic concern, not previously flagged', true),
-          long('cbt', 'CBT or assessment results received this week: any class or student of concern', true),
+          long('cbt', 'CBT or assessment results received today: any class or student of concern', true),
         ],
       },
       {
         title: 'D. Student conduct',
         fields: [
-          long('discipline', 'Discipline incidents this week (summary, not individual slips)'),
+          long('discipline', 'Discipline incidents today (summary, not individual slips)'),
           long('patterns', 'Patterns observed in student behaviour, positive or negative', true),
         ],
       },
       {
         title: 'E. Teacher conduct and welfare',
         fields: [
-          yn('teacher_concern', 'Any teacher conduct concern this week (lateness, phone use, language, preparation)', 'yes'),
+          yn('teacher_concern', 'Any teacher conduct concern today (lateness, phone use, language, preparation)', 'yes'),
           long('welfare', 'Staff welfare or wellbeing matters to flag', true),
         ],
       },
       {
         title: 'F. Parent and community interactions',
-        fields: [long('parents', 'Parent interactions of note this week (positive or concerning)')],
+        fields: [long('parents', 'Parent interactions of note today (positive or concerning)')],
       },
       {
-        title: 'G. Next week priorities',
-        fields: [list('priorities', 'The three most important things to focus on in the primary unit next week')],
+        title: "G. Tomorrow's priorities",
+        fields: [list('priorities', 'The three most important things to focus on in the primary unit tomorrow')],
       },
       {
         title: 'H. Escalation to Head of School',
@@ -185,7 +190,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'C. Assessment and learning',
         fields: [
           long('progress', 'Any child whose learning progress is notably behind or ahead of peers', true),
-          yn('dear_time', 'Water break followed as timetabled', 'no', 'Reason'),
+          yn('dear_time', 'Water break followed as timetabled'),
         ],
       },
       {
