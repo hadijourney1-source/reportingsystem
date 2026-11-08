@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
+import { ReminderToggle } from '@/components/ReminderToggle';
 import { TEMPLATES, type Field } from '@/lib/templates';
 import { periodFor, prettyDate, todayLagos, weekday } from '@/lib/period';
 
@@ -190,6 +191,8 @@ export default function ReportPage() {
         <p className="mt-1 text-sm text-muted">
           {template.frequency === 'daily' ? prettyDate(today) : `Week of ${prettyDate(period)}`} · to {template.reportsTo}
         </p>
+
+        <ReminderToggle me={me} />
 
         {savedAt && (
           <p role="status" className="mt-4 rounded-md border border-green-700 bg-green-50 px-3 py-2 text-sm text-green-900">

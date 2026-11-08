@@ -5,7 +5,12 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const lora = Lora({ subsets: ['latin'], variable: '--font-lora' });
 
-export const metadata: Metadata = { title: 'Eunifrance Staff Reports' };
+export const metadata: Metadata = {
+  title: 'Eunifrance Staff Reports',
+  manifest: '/manifest.webmanifest',
+  icons: { apple: '/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'Reports', statusBarStyle: 'default' },
+};
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#6e2d31' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
