@@ -178,7 +178,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           yn('welfare_concern', 'Any child welfare concern observed today (physical, emotional or social)', 'yes'),
           yn('foundational', 'Any child showing signs of early foundational difficulty (language, motor, attention, social)', 'yes', 'Name and class'),
-          long('welfare_details', 'Details and observations', true),
+          long('welfare_details', 'Details and observations (name and class of each child)', true),
         ],
       },
       {
