@@ -10,6 +10,13 @@ type StaffRow = { id: string; name: string; role: string };
 type Sub = { staff_id: string; period: string; answers: Record<string, string | string[]>; submitted_at: string };
 
 const roleLabel = (r: string) => r.replace(/_/g, ' ');
+const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
+function addDays(date: string, n: number): string {
+  const d = new Date(date + 'T12:00:00Z');
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+}
 
 function Answers({ role, answers }: { role: string; answers: Sub['answers'] }) {
   const t = TEMPLATES[role];
@@ -42,6 +49,22 @@ function Answers({ role, answers }: { role: string; answers: Sub['answers'] }) {
   );
 }
 
+function Mark({ state }: { state: 'done' | 'missing' | 'open' | 'none' }) {
+  const look = {
+    done: 'bg-green-100 text-green-900',
+    missing: 'bg-red-100 text-red-900',
+    open: 'bg-brand/10 text-muted',
+    none: 'text-muted/50',
+  }[state];
+  const sign = { done: '✓', missing: '✗', open: '○', none: '–' }[state];
+  const word = { done: 'Submitted', missing: 'Missing', open: 'Not yet', none: 'No report' }[state];
+  return (
+    <span role="img" aria-label={word} className={`inline-flex h-9 w-9 items-center justify-center rounded-md text-base font-semibold ${look}`}>
+      {sign}
+    </span>
+  );
+}
+
 export default function TeamPage() {
   const router = useRouter();
   const me = useMe();
@@ -50,6 +73,8 @@ export default function TeamPage() {
   const [open, setOpen] = useState<string | null>(null);
   const [today, setToday] = useState('');
   const [day, setDay] = useState('');
+  const [view, setView] = useState<'day' | 'week'>('day');
+
   useEffect(() => {
     const t = todayLagos();
     setToday(t);
@@ -63,83 +88,155 @@ export default function TeamPage() {
   useEffect(() => {
     if (!me || !day || !['director', 'head_of_school'].includes(me.role)) return;
     setOpen(null);
+    const monday = mondayOf(day);
+    const periods = view === 'week' ? [0, 1, 2, 3, 4].map((i) => addDays(monday, i)) : [day, monday];
     fetch('/api/team', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ staffId: me.id, pin: me.pin, periods: [day, mondayOf(day)] }),
+      body: JSON.stringify({ staffId: me.id, pin: me.pin, periods }),
     })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => { setStaff(d.staff); setSubs(d.subs); })
       .catch(() => setStaff([]));
-  }, [me, day]);
+  }, [me, day, view]);
 
   if (!me || !today || !day) return null;
 
-  const step = (n: number) => {
-    const d = new Date(day + 'T12:00:00Z');
-    d.setUTCDate(d.getUTCDate() + n);
-    const next = d.toISOString().slice(0, 10);
-    if (next <= today) setDay(next);
+  const step = (dir: number) => {
+    const next = addDays(day, dir * (view === 'week' ? 7 : 1));
+    setDay(next > today ? today : next);
   };
+
+  const monday = mondayOf(day);
+  const weekDates = [0, 1, 2, 3, 4].map((i) => addDays(monday, i));
+
+  function dayState(staffId: string, role: string, date: string): 'done' | 'missing' | 'open' {
+    const t = TEMPLATES[role];
+    const period = periodFor(t.frequency, date);
+    const hit = subs.some((x) => x.staff_id === staffId && x.period === period);
+    return hit ? 'done' : period < periodFor(t.frequency, today) ? 'missing' : 'open';
+  }
 
   return (
     <>
       <Header me={me} />
       <main className="mx-auto max-w-2xl px-4 py-6">
         <h1 className="text-2xl font-semibold text-brand-dark">Team</h1>
+
+        <div className="mt-3 flex gap-2" role="tablist">
+          {(['day', 'week'] as const).map((v) => (
+            <button
+              key={v} role="tab" aria-selected={view === v} onClick={() => setView(v)}
+              className={`min-h-11 flex-1 rounded-md border text-base font-medium ${
+                view === v ? 'border-brand bg-brand text-white' : 'border-brand/40 bg-white'
+              }`}
+            >
+              {v === 'day' ? 'Day' : 'Week'}
+            </button>
+          ))}
+        </div>
+
         <div className="mt-3 flex items-center gap-2">
-          <button onClick={() => step(-1)} aria-label="Previous day" className="min-h-11 min-w-11 rounded-md border border-brand/40 bg-white text-lg">‹</button>
+          <button onClick={() => step(-1)} aria-label={view === 'week' ? 'Previous week' : 'Previous day'} className="min-h-11 min-w-11 rounded-md border border-brand/40 bg-white text-lg">‹</button>
           <input
             type="date" value={day} max={today}
             onChange={(e) => e.target.value && e.target.value <= today && setDay(e.target.value)}
             className="min-h-11 flex-1 rounded-md border border-brand/40 bg-white px-3 text-base"
           />
-          <button onClick={() => step(1)} disabled={day >= today} aria-label="Next day" className="min-h-11 min-w-11 rounded-md border border-brand/40 bg-white text-lg disabled:opacity-40">›</button>
+          <button
+            onClick={() => step(1)} disabled={view === 'week' ? monday >= mondayOf(today) : day >= today}
+            aria-label={view === 'week' ? 'Next week' : 'Next day'}
+            className="min-h-11 min-w-11 rounded-md border border-brand/40 bg-white text-lg disabled:opacity-40"
+          >›</button>
           {day !== today && (
             <button onClick={() => setDay(today)} className="min-h-11 rounded-md border border-brand/40 bg-white px-3 text-sm">Today</button>
           )}
         </div>
-        <p className="mt-2 text-sm text-muted">{prettyDate(day)}</p>
+        <p className="mt-2 text-sm text-muted">
+          {view === 'week' ? `Week of ${prettyDate(monday)}` : prettyDate(day)}
+        </p>
 
         {staff && staff.length === 0 && <p className="mt-6 text-muted">No staff yet.</p>}
 
-        <ul className="mt-4 divide-y divide-brand/20 border-y border-brand/20">
-          {(staff ?? []).map((s) => {
-            const t = TEMPLATES[s.role];
-            const period = periodFor(t.frequency, day);
-            const sub = subs.find((x) => x.staff_id === s.id && x.period === period);
-            const weekend = t.frequency === 'daily' && weekday(day) >= 6;
-            const missed = !sub && !weekend && period < periodFor(t.frequency, today);
-            const isOpen = open === s.id;
-            return (
-              <li key={s.id} className="bg-white">
-                <button
-                  onClick={() => sub && setOpen(isOpen ? null : s.id)}
-                  className="flex min-h-14 w-full items-center justify-between gap-3 px-3 py-2 text-left"
-                  disabled={!sub}
-                >
-                  <span>
-                    <span className="block text-base font-medium">{s.name}</span>
-                    <span className="block text-sm capitalize text-muted">
-                      {roleLabel(s.role)} · {t.frequency}
+        {view === 'week' ? (
+          <div className="mt-4 overflow-x-auto border-y border-brand/20 bg-white">
+            <table className="w-full min-w-[420px] border-collapse text-left">
+              <thead>
+                <tr className="border-b border-brand/20 text-xs uppercase tracking-wide text-brand">
+                  <th className="sticky left-0 bg-white px-3 py-2 font-semibold">Name</th>
+                  {weekDates.map((d, i) => (
+                    <th key={d} className={`px-1 py-2 text-center font-semibold ${d === today ? 'text-brand-dark underline' : ''}`}>
+                      {DAY_NAMES[i]}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-brand/10">
+                {(staff ?? []).map((s) => {
+                  const t = TEMPLATES[s.role];
+                  return (
+                    <tr key={s.id}>
+                      <td className="sticky left-0 bg-white px-3 py-2">
+                        <span className="block text-base font-medium">{s.name}</span>
+                        <span className="block text-xs capitalize text-muted">{roleLabel(s.role)} · {t.frequency}</span>
+                      </td>
+                      {t.frequency === 'weekly' ? (
+                        <td colSpan={5} className="px-1 py-2 text-center">
+                          <Mark state={dayState(s.id, s.role, monday)} />
+                          <span className="ml-2 text-sm text-muted">whole week</span>
+                        </td>
+                      ) : (
+                        weekDates.map((d) => (
+                          <td key={d} className="px-1 py-2 text-center">
+                            <Mark state={dayState(s.id, s.role, d)} />
+                          </td>
+                        ))
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <ul className="mt-4 divide-y divide-brand/20 border-y border-brand/20">
+            {(staff ?? []).map((s) => {
+              const t = TEMPLATES[s.role];
+              const period = periodFor(t.frequency, day);
+              const sub = subs.find((x) => x.staff_id === s.id && x.period === period);
+              const weekend = t.frequency === 'daily' && weekday(day) >= 6;
+              const missed = !sub && !weekend && period < periodFor(t.frequency, today);
+              const isOpen = open === s.id;
+              return (
+                <li key={s.id} className="bg-white">
+                  <button
+                    onClick={() => sub && setOpen(isOpen ? null : s.id)}
+                    className="flex min-h-14 w-full items-center justify-between gap-3 px-3 py-2 text-left"
+                    disabled={!sub}
+                  >
+                    <span>
+                      <span className="block text-base font-medium">{s.name}</span>
+                      <span className="block text-sm capitalize text-muted">
+                        {roleLabel(s.role)} · {t.frequency}
+                      </span>
                     </span>
-                  </span>
-                  <span className={`rounded px-2 py-1 text-sm font-medium ${sub ? 'bg-green-100 text-green-900' : missed ? 'bg-red-100 text-red-900' : 'bg-brand/10 text-muted'}`}>
-                    {sub ? 'Submitted' : missed ? 'Missing' : weekend ? 'Weekend' : 'Not yet'}
-                  </span>
-                </button>
-                {sub && isOpen && (
-                  <div className="px-3 pb-4">
-                    <p className="text-sm text-muted">
-                      {new Date(sub.submitted_at).toLocaleString('en-GB', { timeZone: 'Africa/Lagos' })}
-                    </p>
-                    <Answers role={s.role} answers={sub.answers} />
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
+                    <span className={`rounded px-2 py-1 text-sm font-medium ${sub ? 'bg-green-100 text-green-900' : missed ? 'bg-red-100 text-red-900' : 'bg-brand/10 text-muted'}`}>
+                      {sub ? 'Submitted' : missed ? 'Missing' : weekend ? 'Weekend' : 'Not yet'}
+                    </span>
+                  </button>
+                  {sub && isOpen && (
+                    <div className="px-3 pb-4">
+                      <p className="text-sm text-muted">
+                        {new Date(sub.submitted_at).toLocaleString('en-GB', { timeZone: 'Africa/Lagos' })}
+                      </p>
+                      <Answers role={s.role} answers={sub.answers} />
+                    </div>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </main>
     </>
   );

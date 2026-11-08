@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   if (!me || !READER_ROLES.includes(me.role) || !pinOk(me, body.pin)) {
     return Response.json({ error: 'Not allowed.' }, { status: 403 });
   }
-  const periods = Array.isArray(body.periods) ? body.periods.filter(isDate).slice(0, 4) : [];
+  const periods = Array.isArray(body.periods) ? body.periods.filter(isDate).slice(0, 7) : [];
 
   let q = db().from('staff').select('id, name, role').neq('id', me.id).order('name');
   if (me.role === 'head_of_school') q = q.eq('reports_to', me.id);
