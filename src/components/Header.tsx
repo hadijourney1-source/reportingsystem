@@ -29,6 +29,7 @@ export function Header({ me }: { me: Me }) {
         </nav>
         <div className="flex items-center gap-3 text-sm text-white/80">
           <span className="hidden sm:inline">{me.name}</span>
+          <Link href="/pin" className="py-2 underline-offset-2 hover:underline">PIN</Link>
           <button onClick={switchPerson} className="min-h-11 rounded border border-white/40 px-3 text-white">
             Not you?
           </button>
