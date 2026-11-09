@@ -144,7 +144,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'E. Teacher conduct and welfare',
         fields: [
           yn('teacher_concern', 'Any teacher conduct concern today (lateness, phone use, language, preparation)'),
-          long('welfare', 'Details of the concern (teacher name and class)', true),
+          long('welfare', "Details of the concern (teacher's name and class)", true),
         ],
       },
       {
