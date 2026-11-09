@@ -694,9 +694,8 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'Part E: Withdrawals and records',
         fields: [
-          L('withdrawn', 'Learner(s) withdrawn / transferring (name, class, reason)'),
-          YO('exit_updated', 'Exit records updated on all platforms'),
-          { id: 'fee_referred', type: 'yesno', label: 'Fee-related enquiries referred to Bursar / OPM', detail: { on: 'yes', label: 'How many?' }, optional: true },
+          L('withdrawn', 'Learner(s) withdrawn (name, class, reason)'),
+          YO('exit_updated', 'Exit records updated on all platforms in Part C'),
         ],
       },
       {
