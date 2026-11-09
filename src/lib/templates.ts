@@ -741,6 +741,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'Part C: Records outstanding',
         fields: [
           L('birth_certs', 'Birth certificates not yet collected (name, class)'),
+          L('name_mismatch', 'Name on certificate not the same as on form (name, class)'),
           L('forms_unchecked', 'Online forms not yet checked'),
           L('not_on_platforms', 'Learners not yet on all platforms (Eschool / Klacify / Tufee)'),
           L('withdrawals', 'Withdrawals this week'),
