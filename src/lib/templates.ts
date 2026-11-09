@@ -8,7 +8,7 @@ export type Field =
       type: 'text' | 'long' | 'number' | 'date' | 'list';
       label: string;
       optional?: boolean;
-      requiredWhen?: { ids: string[]; value: 'Yes' | 'No' };
+      requiredWhen?: { ids: string[]; value: 'Yes' | 'No' | 'Filled' };
     }
   | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean };
 
@@ -32,12 +32,18 @@ const choice = (id: string, label: string, options: string[]): Field => ({ id, t
 const checks = (id: string, label: string, options: string[], optional = true): Field =>
   ({ id, type: 'checks', label, options, optional });
 
-// A details box that must be filled in when any of the linked Yes/No answers equals `value`.
-const need = (f: Field, ids: string[], value: 'Yes' | 'No' = 'Yes'): Field =>
+// A details box that must be filled in when any linked answer equals `value`
+// ('Filled' = the linked box has any text in it).
+const need = (f: Field, ids: string[], value: 'Yes' | 'No' | 'Filled' = 'Yes'): Field =>
   ({ ...f, requiredWhen: { ids, value } }) as Field;
 
 export function mustFill(f: Field, answers: Record<string, string | string[]>): boolean {
-  return 'requiredWhen' in f && !!f.requiredWhen && f.requiredWhen.ids.some((id) => answers[id] === f.requiredWhen!.value);
+  if (!('requiredWhen' in f) || !f.requiredWhen) return false;
+  const { ids, value } = f.requiredWhen;
+  return ids.some((id) => {
+    const a = answers[id];
+    return value === 'Filled' ? typeof a === 'string' && a.trim() !== '' : a === value;
+  });
 }
 
 const flag = long('director_flag', 'Flag for Director (write N/A if nothing to flag)');
@@ -144,7 +150,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           long('intervention', 'Critical and High Intervention students: update on each today'),
           long('new_concerns', 'New students showing academic concern, not previously flagged', true),
-          long('new_concerns_action', 'What was done about it?', true),
+          need(long('new_concerns_action', 'What was done about it?', true), ['new_concerns'], 'Filled'),
         ],
       },
       {
