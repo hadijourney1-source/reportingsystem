@@ -674,8 +674,8 @@ export const TEMPLATES: Record<string, Template> = {
           {
             id: 'platform_ticks',
             type: 'grid',
-            label: 'Tick every platform each item was done on',
-            rows: ['Platforms registered on', 'Admission register', 'Bulk SMS platform'],
+            label: 'Platforms registered on',
+            rows: ['Admission register', 'Bulk SMS platform'],
             cols: ['Eschool', 'Klacify', 'Tufee'],
             optional: true,
           },
