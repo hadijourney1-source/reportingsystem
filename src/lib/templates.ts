@@ -743,7 +743,7 @@ export const TEMPLATES: Record<string, Template> = {
           L('birth_certs', 'Birth certificates not yet collected (name, class)'),
           L('name_mismatch', 'Name on certificate not the same as on form (name, class)'),
           L('forms_unchecked', 'Online forms not yet checked'),
-          L('not_on_platforms', 'Learners not yet on all platforms (Eschool / Klacify / Tufee)'),
+          L('not_on_platforms', 'Learners not yet on all platforms (name, pending platform: Eschool / Klacify / Tufee)'),
           L('withdrawals', 'Withdrawals this week'),
           YO('withdrawals_updated', 'Withdrawal records updated'),
         ],
