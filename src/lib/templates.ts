@@ -3,7 +3,13 @@
 
 export type Field =
   | { id: string; type: 'yesno'; label: string; detail?: { on: 'yes' | 'no'; label: string }; optional?: boolean }
-  | { id: string; type: 'text' | 'long' | 'number' | 'date' | 'list'; label: string; optional?: boolean }
+  | {
+      id: string;
+      type: 'text' | 'long' | 'number' | 'date' | 'list';
+      label: string;
+      optional?: boolean;
+      requiredWhen?: { ids: string[]; value: 'Yes' | 'No' };
+    }
   | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean };
 
 export type Section = { title: string; days?: number[]; fields: Field[] }; // days: 1=Mon ... 5=Fri
@@ -25,6 +31,14 @@ const list = (id: string, label: string, optional = false): Field => ({ id, type
 const choice = (id: string, label: string, options: string[]): Field => ({ id, type: 'choice', label, options });
 const checks = (id: string, label: string, options: string[], optional = true): Field =>
   ({ id, type: 'checks', label, options, optional });
+
+// A details box that must be filled in when any of the linked Yes/No answers equals `value`.
+const need = (f: Field, ids: string[], value: 'Yes' | 'No' = 'Yes'): Field =>
+  ({ ...f, requiredWhen: { ids, value } }) as Field;
+
+export function mustFill(f: Field, answers: Record<string, string | string[]>): boolean {
+  return 'requiredWhen' in f && !!f.requiredWhen && f.requiredWhen.ids.some((id) => answers[id] === f.requiredWhen!.value);
+}
 
 const flag = long('director_flag', 'Flag for Director (write N/A if nothing to flag)');
 
@@ -144,7 +158,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'E. Teacher conduct and welfare',
         fields: [
           yn('teacher_concern', 'Any teacher conduct concern today (lateness, phone use, language, preparation)'),
-          long('welfare', "Details of the concern (teacher's name and class)", true),
+          need(long('welfare', "Details of the concern (teacher's name and class)", true), ['teacher_concern']),
         ],
       },
       {
@@ -183,7 +197,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           yn('welfare_concern', 'Any child welfare concern observed today (physical, emotional or social)'),
           yn('foundational', 'Any child showing signs of early foundational difficulty (language, motor, attention, social)'),
-          long('welfare_details', 'Details and observations (name and class of each child)', true),
+          need(long('welfare_details', 'Details and observations (name and class of each child)', true), ['welfare_concern', 'foundational']),
         ],
       },
       {
@@ -212,7 +226,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'E. Staff conduct and welfare',
         fields: [
           yn('staff_concern', 'Any staff conduct concern in the nursery today'),
-          long('staff_support', 'Details of the concern (staff name and class)', true),
+          need(long('staff_support', 'Details of the concern (staff name and class)', true), ['staff_concern']),
         ],
       },
       {
@@ -364,7 +378,7 @@ export const TEMPLATES: Record<string, Template> = {
           N('late_n', 'Number of staff late'),
           LS('late_names', 'Names of late staff'),
           Y('cover_arranged', 'Cover arranged for absent teachers'),
-          L('cover_details', 'Class(es) covered and by whom'),
+          need(L('cover_details', 'Class(es) covered and by whom'), ['cover_arranged']),
         ],
       },
       {

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
 import { ReminderToggle } from '@/components/ReminderToggle';
-import { reportsFor, type Field, type Template } from '@/lib/templates';
+import { mustFill, reportsFor, type Field, type Template } from '@/lib/templates';
 import { periodFor, prettyDate, todayLagos, weekday } from '@/lib/period';
 
 type Answers = Record<string, string | string[]>;
@@ -18,7 +18,7 @@ function FieldInput({ field, answers, set, error }: {
 }) {
   const value = answers[field.id];
   const str = typeof value === 'string' ? value : '';
-  const required = !('optional' in field && field.optional);
+  const required = mustFill(field, answers) || !('optional' in field && field.optional);
   const detail = answers[field.id + '__detail'];
 
   return (
@@ -162,7 +162,7 @@ export default function ReportPage() {
     const errs: Record<string, string> = {};
     for (const s of sections) for (const f of s.fields) {
       const v = answers[f.id];
-      const optional = 'optional' in f && f.optional;
+      const optional = 'optional' in f && f.optional && !mustFill(f, answers);
       const empty = v === undefined || (typeof v === 'string' && !v.trim()) || (Array.isArray(v) && !v.length);
       if (!optional && empty) errs[f.id] = f.type === 'yesno' ? 'Choose Yes or No.' : 'Please fill this in.';
       else if (f.type === 'yesno' && f.detail && v === (f.detail.on === 'yes' ? 'Yes' : 'No')) {
