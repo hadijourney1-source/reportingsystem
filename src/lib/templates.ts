@@ -10,8 +10,7 @@ export type Field =
       optional?: boolean;
       requiredWhen?: { ids: string[]; value: 'Yes' | 'No' | 'Filled' };
     }
-  | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean }
-  | { id: string; type: 'grid'; label: string; rows: string[]; cols: string[]; optional?: boolean };
+  | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean };
 
 export type Section = { title: string; days?: number[]; fields: Field[] }; // days: 1=Mon ... 5=Fri
 
@@ -671,15 +670,14 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           LS('enrolled_names', 'Name(s)'),
           T('enrolled_classes', 'Class(es)'),
-          {
-            id: 'platform_ticks',
-            type: 'grid',
-            label: 'Platforms registered on',
-            rows: ['Admission register', 'Bulk SMS platform'],
-            cols: ['Eschool', 'Klacify', 'Tufee'],
-            optional: true,
-          },
-          YO('whatsapp', 'General WhatsApp platforms and class platform'),
+          checks('platforms_done', 'Platforms registered on', [
+            'Klacify',
+            'Eschool',
+            'Admission register',
+            'Bulk SMS platform',
+            'Class WhatsApp platform',
+            'General WhatsApp platform',
+          ]),
           YO('tufee_form', 'Tufee registration form sent to parents and dropped on admin platform'),
           YO('form_checked', 'Online form properly checked'),
           YO('birth_cert', 'Birth certificate collected'),
@@ -871,15 +869,3 @@ export const expectedFor = (role: string): Template[] =>
 
 // Everything a person can open.
 export const reportsFor = (role: string): Template[] => expectedFor(role);
-
-// A grid answer is stored as ["Row::Col", ...]; this turns it into readable lines.
-export function gridSummary(f: Field, value: string | string[] | undefined): string {
-  if (f.type !== 'grid' || !Array.isArray(value)) return '';
-  return f.rows
-    .map((r) => {
-      const cols = f.cols.filter((c) => value.includes(`${r}::${c}`));
-      return cols.length ? `${r}: ${cols.join(', ')}` : '';
-    })
-    .filter(Boolean)
-    .join('\n');
-}

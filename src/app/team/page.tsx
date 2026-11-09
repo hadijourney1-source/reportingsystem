@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
-import { TEMPLATES, expectedFor, gridSummary, type Template } from '@/lib/templates';
+import { TEMPLATES, expectedFor, type Template } from '@/lib/templates';
 import { mondayOf, periodFor, prettyDate, todayLagos, weekday } from '@/lib/period';
 
 type StaffRow = { id: string; name: string; role: string };
@@ -44,7 +44,7 @@ function Answers({ template, answers }: { template: string; answers: Sub['answer
                 <div key={f.id} className="mb-3">
                   <p className="text-sm text-muted">{f.label}</p>
                   <p className="whitespace-pre-wrap text-base">
-                    {f.type === 'grid' ? gridSummary(f, v) : Array.isArray(v) ? v.join(', ') : v}
+                    {Array.isArray(v) ? v.join(', ') : v}
                     {typeof detail === 'string' && detail ? ` — ${detail}` : ''}
                   </p>
                 </div>
