@@ -662,7 +662,7 @@ export const TEMPLATES: Record<string, Template> = {
           Y('learners_attendance', "Learners' attendance confirmed marked on Tufee by teachers"),
           choice('birthday_sms', "Birthday celebrant(s)' SMS sent and picture posted", ['Yes', 'No', 'Not applicable / none today']),
           T('newborn_family', 'Name of new born family'),
-          YO('newborn_sms', 'New born SMS sent'),
+          choice('newborn_sms', 'New born SMS sent', ['Yes', 'No', 'Not applicable / none today']),
         ],
       },
       {
