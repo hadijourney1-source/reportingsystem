@@ -97,6 +97,46 @@ function FieldInput({ field, answers, set, error }: {
         </div>
       )}
 
+      {field.type === 'grid' && (
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse text-left">
+            <thead>
+              <tr>
+                <th className="py-1" />
+                {field.cols.map((c) => (
+                  <th key={c} className="px-1 py-1 text-center text-xs font-semibold uppercase tracking-wide text-brand">{c}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {field.rows.map((r) => (
+                <tr key={r} className="border-t border-brand/10">
+                  <td className="py-2 pr-2 text-base">{r}</td>
+                  {field.cols.map((c) => {
+                    const key = `${r}::${c}`;
+                    const on = Array.isArray(value) && value.includes(key);
+                    return (
+                      <td key={c} className="px-1 py-1 text-center">
+                        <button
+                          type="button" aria-pressed={on} aria-label={`${r}: ${c}`}
+                          onClick={() => {
+                            const cur = Array.isArray(value) ? value : [];
+                            set(field.id, on ? cur.filter((x) => x !== key) : [...cur, key]);
+                          }}
+                          className={`h-11 w-11 rounded-md border text-lg font-semibold ${pick(on)}`}
+                        >
+                          {on ? '✓' : ''}
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
       {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
     </div>
   );

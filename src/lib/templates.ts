@@ -10,7 +10,8 @@ export type Field =
       optional?: boolean;
       requiredWhen?: { ids: string[]; value: 'Yes' | 'No' | 'Filled' };
     }
-  | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean };
+  | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean }
+  | { id: string; type: 'grid'; label: string; rows: string[]; cols: string[]; optional?: boolean };
 
 export type Section = { title: string; days?: number[]; fields: Field[] }; // days: 1=Mon ... 5=Fri
 
@@ -670,9 +671,14 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           LS('enrolled_names', 'Name(s)'),
           T('enrolled_classes', 'Class(es)'),
-          checks('platforms', 'Platforms registered on', ['Eschool', 'Klacify', 'Tufee']),
-          YO('admission_register', 'Admission register'),
-          YO('bulk_sms', 'Bulk SMS platform'),
+          {
+            id: 'platform_ticks',
+            type: 'grid',
+            label: 'Tick every platform each item was done on',
+            rows: ['Platforms registered on', 'Admission register', 'Bulk SMS platform'],
+            cols: ['Eschool', 'Klacify', 'Tufee'],
+            optional: true,
+          },
           YO('whatsapp', 'General WhatsApp platforms and class platform'),
           YO('tufee_form', 'Tufee registration form sent to parents and dropped on admin platform'),
           YO('form_checked', 'Online form properly checked'),
@@ -865,3 +871,15 @@ export const expectedFor = (role: string): Template[] =>
 
 // Everything a person can open.
 export const reportsFor = (role: string): Template[] => expectedFor(role);
+
+// A grid answer is stored as ["Row::Col", ...]; this turns it into readable lines.
+export function gridSummary(f: Field, value: string | string[] | undefined): string {
+  if (f.type !== 'grid' || !Array.isArray(value)) return '';
+  return f.rows
+    .map((r) => {
+      const cols = f.cols.filter((c) => value.includes(`${r}::${c}`));
+      return cols.length ? `${r}: ${cols.join(', ')}` : '';
+    })
+    .filter(Boolean)
+    .join('\n');
+}
