@@ -67,6 +67,8 @@ const NO = (id: string, label: string): Field => ({ id, type: 'number', label, o
 const Y = (id: string, label: string): Field => yn(id, label);
 const YO = (id: string, label: string): Field => ({ id, type: 'yesno', label, optional: true });
 
+const PLATFORMS = ['Eschool', 'Klacify', 'Tufee'];
+
 const closing: Section = {
   title: 'Closing',
   fields: [
@@ -670,10 +672,10 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           LS('enrolled_names', 'Name(s)'),
           T('enrolled_classes', 'Class(es)'),
-          checks('platforms', 'Platforms registered on', ['Eschool', 'Klacify', 'Tufee']),
-          YO('admission_register', 'Admission register'),
-          YO('bulk_sms', 'Bulk SMS platform'),
-          YO('whatsapp', 'General WhatsApp platforms and class platform'),
+          checks('platforms', 'Platforms registered on', PLATFORMS),
+          checks('admission_register', 'Admission register', PLATFORMS),
+          checks('bulk_sms', 'Bulk SMS platform', PLATFORMS),
+          checks('whatsapp', 'General WhatsApp platforms and class platform', PLATFORMS),
           YO('tufee_form', 'Tufee registration form sent to parents and dropped on admin platform'),
           YO('form_checked', 'Online form properly checked'),
           YO('birth_cert', 'Birth certificate collected'),
