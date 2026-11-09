@@ -87,6 +87,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           yn('gate_roster', 'Gate roster ran this morning', 'no', 'Reason'),
           yn('in_class_15', 'Students in classrooms within 15 minutes of start time', 'no', 'Reason'),
+          yn('latecomers_duty', 'Latecomers duty enforced'),
         ],
       },
       {
