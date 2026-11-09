@@ -673,6 +673,7 @@ export const TEMPLATES: Record<string, Template> = {
           checks('platforms_done', 'Platforms registered on', [
             'Klacify',
             'Eschool',
+            'Tufee',
             'Admission register',
             'Bulk SMS platform',
             'Class WhatsApp platform',
