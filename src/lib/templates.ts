@@ -686,7 +686,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'Part D: Enquiries and visitors',
         fields: [
           N('enquiries_n', 'Number of admission enquiries (walk-in / call / WhatsApp)'),
-          L('prospects', 'Prospective parents (name, phone, class sought, follow-up date)'),
+          L('prospects', 'Prospective parents (follow up done on tufee)'),
           N('visitors_n', 'Number of visitors received'),
           L('visitors', 'Visitors (name, purpose, person seen)'),
         ],
