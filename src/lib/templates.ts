@@ -675,7 +675,7 @@ export const TEMPLATES: Record<string, Template> = {
           checks('platforms', 'Platforms registered on', PLATFORMS),
           checks('admission_register', 'Admission register', PLATFORMS),
           checks('bulk_sms', 'Bulk SMS platform', PLATFORMS),
-          checks('whatsapp', 'General WhatsApp platforms and class platform', PLATFORMS),
+          YO('whatsapp', 'General WhatsApp platforms and class platform'),
           YO('tufee_form', 'Tufee registration form sent to parents and dropped on admin platform'),
           YO('form_checked', 'Online form properly checked'),
           YO('birth_cert', 'Birth certificate collected'),
