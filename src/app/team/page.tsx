@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMe } from '@/lib/useMe';
+import { clearMe, useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
 import { TEMPLATES, expectedFor, type Template } from '@/lib/templates';
 import { mondayOf, periodFor, prettyDate, todayLagos, weekday } from '@/lib/period';
@@ -102,9 +102,12 @@ export default function TeamPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ staffId: me.id, pin: me.pin, periods }),
     })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((r) => {
+        if (r.status === 403) clearMe();
+        return r.ok ? r.json() : Promise.reject(r.status);
+      })
       .then((d) => { setStaff(d.staff); setSubs(d.subs); })
-      .catch(() => setStaff([]));
+      .catch((status) => (status === 403 ? router.replace('/') : setStaff([])));
   }, [me, day, view]);
 
   if (!me || !today || !day) return null;

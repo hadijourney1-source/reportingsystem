@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useMe } from '@/lib/useMe';
+import { clearMe, useMe } from '@/lib/useMe';
 import { Header } from '@/components/Header';
 import { ReminderToggle } from '@/components/ReminderToggle';
 import { mustFill, reportsFor, type Field, type Template } from '@/lib/templates';
@@ -135,7 +135,14 @@ export default function ReportPage() {
     setErrors({});
     setMessage('');
     fetch(`/api/report?staffId=${me.id}&template=${key}&period=${period}`, { headers: { 'x-pin': me.pin ?? '' } })
-      .then((r) => (r.ok ? r.json() : null))
+      .then((r) => {
+        if (r.status === 403) {
+          clearMe();
+          router.replace('/');
+          return null;
+        }
+        return r.ok ? r.json() : null;
+      })
       .then((data) => {
         if (!current) return;
         if (data) {
@@ -189,6 +196,11 @@ export default function ReportPage() {
       body: JSON.stringify({ staffId: me!.id, pin: me!.pin, template: template!.key, period, answers }),
     }).catch(() => null);
     setBusy(false);
+    if (res && res.status === 403) {
+      clearMe();
+      router.replace('/');
+      return;
+    }
     if (!res || !res.ok) return setMessage('Could not submit. Check your connection and try again.');
     setSavedAt((await res.json()).submitted_at);
     setMessage('Submitted. You can still edit and resubmit.');
