@@ -690,6 +690,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           N('enquiries_n', 'Number of admission enquiries (walk-in / call / WhatsApp)'),
           choice('prospects', 'Prospective parents (follow up done on tufee)', ['Yes', 'No', 'Not applicable / none today']),
+          choice('broadcast_list', 'Parent added to broadcast list', ['Yes', 'No', 'Not applicable']),
           N('visitors_n', 'Number of visitors received'),
           L('visitors', 'Visitors (name, purpose, person seen)'),
         ],
