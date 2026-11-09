@@ -100,7 +100,7 @@ export const TEMPLATES: Record<string, Template> = {
             'Gaps found',
           ]),
           list('gap_classes', 'Classes with gaps (if any)', true),
-          yn('dear_time', 'DEAR time was held'),
+          choice('dear_time', 'DEAR time was held', ['Yes', 'No', 'Not applicable today']),
           yn('notes_checked', "Any students' notes checked"),
           need(long('notes_observations', 'Which class, and your observations', true), ['notes_checked']),
         ],
