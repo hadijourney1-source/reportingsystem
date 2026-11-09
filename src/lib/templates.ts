@@ -644,7 +644,7 @@ export const TEMPLATES: Record<string, Template> = {
     key: 'admin_secretary_daily',
     title: 'Admin Secretary: Daily Report',
     frequency: 'daily',
-    reportsTo: 'Director',
+    reportsTo: 'Operations Manager',
     sections: [
       {
         title: 'Part A: Absentees',
@@ -686,7 +686,7 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'Part D: Enquiries and visitors',
         fields: [
           N('enquiries_n', 'Number of admission enquiries (walk-in / call / WhatsApp)'),
-          L('prospects', 'Prospective parents (follow up done on tufee)'),
+          choice('prospects', 'Prospective parents (follow up done on tufee)', ['Yes', 'No', 'Not applicable / none today']),
           N('visitors_n', 'Number of visitors received'),
           L('visitors', 'Visitors (name, purpose, person seen)'),
         ],
@@ -718,7 +718,7 @@ export const TEMPLATES: Record<string, Template> = {
     key: 'admin_secretary_weekly',
     title: 'Admin Secretary: Weekly Report',
     frequency: 'weekly',
-    reportsTo: 'Director',
+    reportsTo: 'Operations Manager',
     sections: [
       { title: 'Term', fields: [{ id: 'week_of_term', type: 'number', label: 'Week of term', optional: true }] },
       {
