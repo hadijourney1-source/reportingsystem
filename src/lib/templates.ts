@@ -679,6 +679,7 @@ export const TEMPLATES: Record<string, Template> = {
           YO('tufee_form', 'Tufee registration form sent to parents and dropped on admin platform'),
           YO('form_checked', 'Online form properly checked'),
           YO('birth_cert', 'Birth certificate collected'),
+          YO('name_matches', 'Name on birth certificate and forms align'),
         ],
       },
       {
