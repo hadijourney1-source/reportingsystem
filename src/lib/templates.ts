@@ -94,11 +94,14 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           list('classrooms_visited', 'Classrooms visited during walkthrough'),
           long('unusual', 'Anything unusual observed (student behaviour, teacher absence, noise, etc.)', true),
-          choice('captain_logs', 'Class captain logs: entries made for morning periods', [
+          choice('captain_logs', 'Class captain logs', [
             'All classes: entries present',
             'Gaps found',
           ]),
           list('gap_classes', 'Classes with gaps (if any)', true),
+          yn('dear_time', 'DEAR time was held'),
+          yn('notes_checked', "Any students' notes checked"),
+          need(long('notes_observations', 'Which class, and your observations', true), ['notes_checked']),
         ],
       },
       {
