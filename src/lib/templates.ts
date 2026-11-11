@@ -412,7 +412,6 @@ export const TEMPLATES: Record<string, Template> = {
           yn('sec_scheme', 'Scheme of work compliance, secondary: all on-scheme', 'no', 'Subject(s) with a gap'),
           long('sec_visit', 'Classroom visit findings this week: most significant observation'),
           long('sec_cbt', 'CBT performance update: any student or subject of concern', true),
-          long('sec_intervention', 'Intervention students: update on Critical and High tier this week', true),
         ],
       },
       {
@@ -421,6 +420,7 @@ export const TEMPLATES: Record<string, Template> = {
           choice('pri_quality', 'Teaching quality, primary unit this week', ['Good', 'Needs attention', 'Concern escalated']),
           long('pri_concern', 'Student performance concern: any class or child flagged this week', true),
           yn('pri_staff', 'Any staff conduct or welfare matter from primary this week', 'yes', 'Details'),
+          long('pri_intervention', 'Intervention students: update on Critical and High tier this week', true),
         ],
       },
       {
