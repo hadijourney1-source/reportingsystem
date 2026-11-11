@@ -253,6 +253,14 @@ export const TEMPLATES: Record<string, Template> = {
         ],
       },
       {
+        title: 'Weekly review (Fridays)',
+        days: [5],
+        fields: [
+          Y('review_held', 'Did review hold this week?'),
+          need(L('review_why', 'If no, why?'), ['review_held'], 'No'),
+        ],
+      },
+      {
         title: "G. Tomorrow's priorities",
         fields: [list('priorities', 'The three most important things for the nursery unit tomorrow')],
       },
@@ -392,19 +400,13 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           N('staff_absent_n', 'Number of staff absent'),
           LS('absent_names', 'Names and reasons for absence'),
-          N('late_n', 'Number of staff late'),
-          LS('late_names', 'Names of late staff'),
-          Y('cover_arranged', 'Cover arranged for absent teachers'),
+          choice('cover_arranged', 'Cover arranged for absent teachers', ['Yes', 'No', 'Not applicable']),
           need(L('cover_details', 'Class(es) covered and by whom'), ['cover_arranged']),
         ],
       },
       {
         title: 'Part B: Teaching and learning',
         fields: [
-          N('notes_expected', 'Lesson notes expected'),
-          N('notes_submitted', 'Lesson notes submitted'),
-          N('notes_approved', 'Lesson notes approved'),
-          LS('notes_yet', 'Names of teachers yet to submit'),
           L('classes_visited', 'Classes visited / observed today'),
           L('remarks', 'Brief remarks on lessons observed'),
           yn('no_teacher', 'Any class left without a teacher at any point', 'yes', 'Class and reason'),
@@ -413,7 +415,6 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: "Part C: Learners' welfare and discipline",
         fields: [
-          Y('attendance_marked', "Learners' attendance confirmed marked on Tufee by teachers"),
           L('discipline', 'Discipline incidents (name, class, incident)'),
           L('action_taken', 'Action taken'),
           L('sick_injured', 'Learners sick or injured in school (name, class)'),
@@ -448,15 +449,6 @@ export const TEMPLATES: Record<string, Template> = {
         ],
       },
       {
-        title: 'Part B: Assessment',
-        fields: [
-          L('tests_given', 'Tests / CAs given this week (class, subject)'),
-          Y('marked', 'Marked and recorded'),
-          Y('uploaded', 'Scores uploaded on Eschool / Klacify'),
-          L('outstanding_marking', 'Outstanding marking (teacher, class)'),
-        ],
-      },
-      {
         title: 'Part C: Learners needing support',
         fields: [
           L('flagged', 'Learners flagged this week (name, class, concern)'),
@@ -470,7 +462,6 @@ export const TEMPLATES: Record<string, Template> = {
           L('observations', 'Lesson observations done this week'),
           L('commended', 'Teachers commended (name, reason)'),
           L('needs_support', 'Teachers needing support (name, area)'),
-          T('notes_rate', 'Lesson notes submission rate this week'),
           yn('training', 'Staff training / briefing held', 'yes', 'Topic'),
         ],
       },
@@ -489,14 +480,10 @@ export const TEMPLATES: Record<string, Template> = {
     reportsTo: 'Director',
     sections: [
       {
-        title: "Part A: Students' attendance and punctuality",
+        title: 'ASP',
         fields: [
-          N('absentees_n', 'Number of absentees'),
-          LS('absentees_names', 'Names and classes of absentees'),
-          YO('parents_contacted', 'Parents contacted'),
-          N('latecomers_n', 'Number of latecomers'),
-          LS('repeat_late', 'Names of repeat latecomers (3+ times this term)'),
-          Y('attendance_marked', "Learners' attendance confirmed marked on Tufee"),
+          Y('asp_held', 'Did ASP hold today?'),
+          need(L('asp_missed', 'How many students did not wait for the ASP? (number, names and classes)'), ['asp_held']),
         ],
       },
       {
@@ -602,7 +589,9 @@ export const TEMPLATES: Record<string, Template> = {
         title: 'Part B: Assessment and performance',
         fields: [
           L('tests', 'Tests / CAs given this week (class, subject)'),
-          Y('recorded', 'Scores recorded and uploaded'),
+          Y('marked', 'Marked and recorded'),
+          Y('uploaded', 'Scores uploaded on Eschool / Klacify'),
+          L('outstanding_marking', 'Outstanding marking (teacher, class)'),
           L('weakest', 'Weakest subjects this week (class, subject)'),
           L('support', 'Learners needing academic support (name, class)'),
         ],
