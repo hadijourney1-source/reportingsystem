@@ -458,6 +458,27 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [list('priorities', 'The three most important academic or operational priorities for the school next week')],
       },
       {
+        title: 'Daily reports from your team',
+        fields: [
+          Y('review_primary', "Primary Unit Leader's daily reports for this week received and reviewed"),
+          Y('review_nursery', "Nursery Unit Leader's daily reports for this week received and reviewed"),
+          Y('review_duty', 'Staff on Duty reports (Nursery & Primary) for this week received and reviewed'),
+        ],
+      },
+      {
+        title: 'Escalations, conduct and complaints',
+        fields: [
+          Y('esc_received', 'Any escalations received from the Primary or Nursery Unit Leader this week?'),
+          need(L('esc_details', 'What were they, and what was done about them?'), ['esc_received']),
+          Y('conduct_raised', 'Any staff conduct concerns raised by the unit leaders this week?'),
+          need(L('conduct_details', 'Which staff (name and class), and what action was taken?'), ['conduct_raised']),
+          Y('duty_issues', 'Any recurring issues from the Staff on Duty reports this week (safety hazards, late pickups, incidents)?'),
+          need(L('duty_details', 'What were they, and what was done about them?'), ['duty_issues']),
+          Y('parent_complaints', 'Any parent complaints from primary or nursery this week?'),
+          need(L('complaint_details', 'What was the complaint, and how was it handled?'), ['parent_complaints']),
+        ],
+      },
+      {
         title: 'H. Matters requiring Director decision',
         fields: [
           long('director_decisions', 'Decisions, approvals or escalations the Director needs to make this week (write N/A if none)'),
