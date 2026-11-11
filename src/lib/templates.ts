@@ -389,87 +389,85 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
 
-  head_of_school_daily: {
-    key: 'head_of_school_daily',
-    title: 'Head of School: Daily Report',
-    frequency: 'daily',
-    reportsTo: 'Director',
-    sections: [
-      {
-        title: 'Part A: Staff attendance and cover',
-        fields: [
-          N('staff_absent_n', 'Number of staff absent'),
-          LS('absent_names', 'Names and reasons for absence'),
-          choice('cover_arranged', 'Cover arranged for absent teachers', ['Yes', 'No', 'Not applicable']),
-          need(L('cover_details', 'Class(es) covered and by whom'), ['cover_arranged']),
-        ],
-      },
-      {
-        title: 'Part B: Teaching and learning',
-        fields: [
-          L('classes_visited', 'Classes visited / observed today'),
-          L('remarks', 'Brief remarks on lessons observed'),
-          yn('no_teacher', 'Any class left without a teacher at any point', 'yes', 'Class and reason'),
-        ],
-      },
-      {
-        title: "Part C: Learners' welfare and discipline",
-        fields: [
-          L('discipline', 'Discipline incidents (name, class, incident)'),
-          L('action_taken', 'Action taken'),
-          L('sick_injured', 'Learners sick or injured in school (name, class)'),
-          YO('parents_informed', 'Parents informed'),
-        ],
-      },
-      {
-        title: 'Part D: Parents and escalations',
-        fields: [
-          L('complaints', 'Academic complaints / enquiries from parents'),
-          L('handled', 'How did you handle it?'),
-          L('pending', 'Pending issues carried over to tomorrow'),
-        ],
-      },
-      closing,
-    ],
-  },
-
-  head_of_school_weekly: {
-    key: 'head_of_school_weekly',
-    title: 'Head of School: Weekly Report',
+  head_of_school: {
+    key: 'head_of_school',
+    title: 'Head of School: Accountability Report',
     frequency: 'weekly',
     reportsTo: 'Director',
     sections: [
-      { title: 'Term', fields: [{ id: 'week_of_term', type: 'number', label: 'Week of term', optional: true }] },
       {
-        title: 'Part A: Curriculum coverage',
+        title: 'A. Whole-school academic overview',
         fields: [
-          L('on_track', 'Classes on track with scheme of work'),
-          L('behind', 'Classes behind (class, subject, reason)'),
-          L('catch_up', 'Plan to catch up'),
+          choice('health', 'Overall academic health of the school this week', [
+            'Strong: all units performing well',
+            'Satisfactory: minor concerns managed',
+            'Concerning: requires Director attention',
+          ]),
+          long('observation', 'Key academic observation from this week (one sentence)'),
         ],
       },
       {
-        title: 'Part C: Learners needing support',
+        title: 'B. Secondary school (VP report summary)',
         fields: [
-          L('flagged', 'Learners flagged this week (name, class, concern)'),
-          L('intervention', 'Intervention started'),
-          YO('parents_contacted', 'Parents contacted'),
+          yn('sec_scheme', 'Scheme of work compliance, secondary: all on-scheme', 'no', 'Subject(s) with a gap'),
+          long('sec_visit', 'Classroom visit findings this week: most significant observation'),
+          long('sec_cbt', 'CBT performance update: any student or subject of concern', true),
+          long('sec_intervention', 'Intervention students: update on Critical and High tier this week', true),
         ],
       },
       {
-        title: 'Part D: Staff performance',
+        title: 'C. Primary school (Primary Unit Leader report summary)',
         fields: [
-          L('observations', 'Lesson observations done this week'),
-          L('commended', 'Teachers commended (name, reason)'),
-          L('needs_support', 'Teachers needing support (name, area)'),
-          yn('training', 'Staff training / briefing held', 'yes', 'Topic'),
+          choice('pri_quality', 'Teaching quality, primary unit this week', ['Good', 'Needs attention', 'Concern escalated']),
+          long('pri_concern', 'Student performance concern: any class or child flagged this week', true),
+          yn('pri_staff', 'Any staff conduct or welfare matter from primary this week', 'yes', 'Details'),
         ],
       },
       {
-        title: 'Part E: Look ahead',
-        fields: [L('next_week', 'Academic activities next week'), L('resources', 'Resources / materials needed')],
+        title: 'D. Nursery unit (Nursery Unit Leader report summary)',
+        fields: [
+          yn('nur_welfare', 'Any child welfare concern flagged this week', 'yes', 'Details'),
+          long('nur_assessment', 'Assessment and learning, nursery this week', true),
+          yn('nur_routines', 'Routines consistent across the nursery unit', 'no', 'Gaps'),
+        ],
       },
-      closing,
+      {
+        title: 'E. Teaching quality across the school',
+        fields: [
+          list('teachers_observed', 'Teachers observed this week across all units (name, unit, one-line finding)'),
+          long('commendable', 'Teacher whose performance was most commendable this week, and why'),
+          long('needs_attention', 'Teacher whose performance requires attention, and what action was taken'),
+        ],
+      },
+      {
+        title: 'F. Culture and GRICE values',
+        fields: [
+          long('grice_example', 'Evidence of GRICE values being lived this week (specific example observed)'),
+          choice('grice_value', 'GRICE value that needs the most attention across the school right now', [
+            'Gratitude',
+            'Respect',
+            'Integrity',
+            'Compassion',
+            'Excellence',
+          ]),
+          long('grice_action', 'Action being taken to address it'),
+        ],
+      },
+      {
+        title: 'G. Whole-school priorities for next week',
+        fields: [list('priorities', 'The three most important academic or operational priorities for the school next week')],
+      },
+      {
+        title: 'H. Matters requiring Director decision',
+        fields: [
+          long('director_decisions', 'Decisions, approvals or escalations the Director needs to make this week (write N/A if none)'),
+          choice('overall', 'Head of School overall assessment of the school this week', [
+            'On track: culture and systems holding',
+            'Some drift: needs closer attention next week',
+            'Significant concern: urgent Director review needed',
+          ]),
+        ],
+      },
     ],
   },
 
@@ -872,7 +870,7 @@ export const ROLE_REPORTS: Record<string, string[]> = {
   primary_unit_leader: ['primary_unit_leader'],
   nursery_unit_leader: ['nursery_unit_leader'],
   operations_manager: ['operations_manager_daily', 'operations_manager_weekly'],
-  head_of_school: ['head_of_school_daily', 'head_of_school_weekly'],
+  head_of_school: ['head_of_school'],
   admin_secretary: ['admin_secretary_daily', 'admin_secretary_weekly'],
   // Two shared logins (Nursery & Primary, Secondary) file the daily duty report.
   staff_on_duty: ['staff_on_duty'],
