@@ -10,7 +10,14 @@ export type Field =
       optional?: boolean;
       requiredWhen?: { ids: string[]; value: 'Yes' | 'No' | 'Filled' };
     }
-  | { id: string; type: 'choice' | 'checks'; label: string; options: string[]; optional?: boolean };
+  | {
+      id: string;
+      type: 'choice' | 'checks';
+      label: string;
+      options: string[];
+      optional?: boolean;
+      requiredWhen?: { ids: string[]; value: 'Yes' | 'No' | 'Filled' };
+    };
 
 export type Section = { title: string; days?: number[]; fields: Field[] }; // days: 1=Mon ... 5=Fri
 
@@ -690,6 +697,7 @@ export const TEMPLATES: Record<string, Template> = {
         fields: [
           N('enquiries_n', 'Number of admission enquiries (walk-in / call / WhatsApp)'),
           choice('prospects', 'Prospective parents (follow up done on tufee)', ['Yes', 'No', 'Not applicable / none today']),
+          need(NO('followed_up_n', 'How many parents were followed up?'), ['prospects']),
           choice('broadcast_list', 'Parent added to broadcast list', ['Yes', 'No', 'Not applicable']),
           N('visitors_n', 'Number of visitors received'),
           L('visitors', 'Visitors (name, purpose, person seen)'),
@@ -712,6 +720,17 @@ export const TEMPLATES: Record<string, Template> = {
       {
         title: 'Parents',
         fields: [L('complaints', 'Any complaints from any parents?'), L('handled', 'How did you handle it?')],
+      },
+      {
+        title: 'Staff changes',
+        fields: [
+          Y('staff_joined', 'Did any new staff join?'),
+          need({ id: 'joined_name', type: 'text', label: 'Name of staff', optional: true }, ['staff_joined']),
+          need({ id: 'joined_role', type: 'choice', label: 'Role', options: ['Academic', 'Non Academic', 'Corper'], optional: true }, ['staff_joined']),
+          need({ id: 'joined_orientation', type: 'choice', label: 'Orientation done', options: ['Yes', 'No'], optional: true }, ['staff_joined']),
+          Y('staff_exited', 'Did any staff exit?'),
+          need({ id: 'exited_name', type: 'text', label: 'Name of staff', optional: true }, ['staff_exited']),
+        ],
       },
       closing,
     ],
@@ -848,6 +867,14 @@ export const TEMPLATES: Record<string, Template> = {
     ],
   },
 };
+
+// Asked on every report.
+const SOCIAL = checks(
+  'social_comment',
+  'Have you commented on any of our social media pages today? Pick the platform you commented on',
+  ['TikTok', 'Facebook', 'Instagram'],
+);
+for (const t of Object.values(TEMPLATES)) t.sections.push({ title: 'Social media', fields: [SOCIAL] });
 
 // Which reports each role fills in. Daily and weekly are separate reports.
 export const ROLE_REPORTS: Record<string, string[]> = {
